@@ -1,0 +1,648 @@
+--- dist.css.bak_auto_sections_2025-12-28_091446	2025-12-28 09:08:11.150914255 -0500
++++ dist.css	2025-12-28 09:20:08.243515143 -0500
+@@ -1,3 +1,8 @@
++
++/* ===== FILE: 00_prelude.css ===== */
++
++/* AUTO SECTION: 00_prelude */
++
+ /* =================================
+ Design system (Figma)
+ ================================= */
+@@ -909,7 +914,11 @@
+ .section-link { text-decoration: none; font-size: 22px; }
+ .section-muted { opacity: .8; }
+ 
++
++/* ===== FILE: 01_home_hero.css ===== */
++
+ /* HOME HERO */
++
+ .home-hero { padding: 18px 0 10px; }
+ 
+ .hero-grid {
+@@ -945,7 +954,11 @@
+ .hero-mini__media { height: 210px; background-color: rgba(0,0,0,.08); }
+ .hero-mini__actions { padding: 14px; }
+ 
++
++/* ===== FILE: 02_hero_banner_figma_layers.css ===== */
++
+ /* HERO banner (Figma layers) */
++
+ .hero-banner {
+ border-radius: 22px;
+ overflow: hidden;
+@@ -1825,68 +1838,51 @@
+ /* reserved for micro tweaks */
+ }
+ 
+-<?php get_header(); ?>
+ 
+ <main class="site-main">
+ <section class="profiles-page">
+ <div class="container">
+ 
+ <header class="section-head">
+-<h1 class="section-title"><?php post_type_archive_title(); ?></h1>
+ <p class="section-subtitle">All profiles</p>
+ </header>
+ 
+-<?php if ( have_posts() ) : ?>
+ <div class="cards-grid cards-grid--profiles">
+-<?php while ( have_posts() ) : the_post(); ?>
+ <article class="profile-card">
+-<a class="profile-card__media" href="<?php the_permalink(); ?>">
+-<?php if ( has_post_thumbnail() ) : ?>
+-<?php the_post_thumbnail('large', ['class' => 'profile-card__img']); ?>
+-<?php else : ?>
+ <div class="profile-card__img profile-card__img--placeholder"></div>
+-<?php endif; ?>
+ 
+-<?php
+ $price = get_post_meta(get_the_ID(), 'price', true);
+ if ($price !== ''):
+-?>
+-<span class="profile-card__price"><?php echo esc_html($price); ?></span>
+-<?php endif; ?>
+ </a>
+ 
+ <div class="profile-card__body">
+ <h3 class="profile-card__title">
+-<a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+ </h3>
+ 
+ <div class="profile-card__meta">
+-<?php
+ $city = get_post_meta(get_the_ID(), 'city', true);
+ if ($city) echo esc_html($city);
+-?>
+ </div>
+ </div>
+ </article>
+-<?php endwhile; ?>
+ </div>
+ 
+ <div class="pagination" style="margin-top:24px;">
+-<?php the_posts_pagination(); ?>
+ </div>
+ 
+-<?php else : ?>
+ <p>No profiles found.</p>
+-<?php endif; ?>
+ 
+ </div>
+ </section>
+ </main>
+ 
+-<?php get_footer(); ?>
++
++
++/* ===== FILE: 03_profile_gallery_upload.css ===== */
+ 
+ /* === Profile Gallery Upload === */
+ 
++
+ .pp-upload-form {
+ margin: 15px 0;
+ }
+@@ -1953,8 +1949,12 @@
+ overflow: hidden;
+ }
+ 
++
++/* ===== FILE: 04_personal_profile_upload_ui.css ===== */
++
+ /* ===== Personal Profile: Upload UI ===== */
+ 
++
+ .pp-upload-form { margin: 12px 0 18px; }
+ 
+ .pp-upload-row{
+@@ -2019,8 +2019,12 @@
+ aspect-ratio: 1 / 1.15;
+ }
+ 
++
++/* ===== FILE: 05_upload_ui.css ===== */
++
+ /* ===== Upload UI ===== */
+ 
++
+ .pp-upload-form {
+ margin: 16px 0;
+ }
+@@ -2247,7 +2251,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 06_hero_image_fix.css ===== */
++
+ /* === HERO IMAGE FIX === */
++
+ .hero {
+ overflow: hidden;
+ }
+@@ -2273,7 +2281,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 07_hero_sizes_override_figma.css ===== */
++
+ /* === HERO SIZES OVERRIDE (FIGMA) === */
++
+ .hero .hero-inner{
+ display:grid !important;
+ grid-template-columns: 360px 1fr !important;
+@@ -2335,7 +2347,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 08_mobile_hero_fix_custom.css ===== */
++
+ /* === MOBILE HERO FIX (CUSTOM) === */
++
+ .hero .hero-preview {
+ height: 200px !important;
+ }
+@@ -2349,7 +2365,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 09_recommendations_size_fix_figma.css ===== */
++
+ /* === RECOMMENDATIONS SIZE FIX (FIGMA) === */
++
+ .home-recommend .recommend-row{
+ display:flex !important;
+ gap:16px !important;
+@@ -2391,8 +2411,12 @@
+ }
+ }
+ 
++
++/* ===== FILE: 10_fix_header_layout.css ===== */
++
+ /* === FIX HEADER LAYOUT === */
+ 
++
+ .topbar {
+ padding: 8px 0 !important;
+ background: #fff;
+@@ -2464,7 +2488,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 11_topbar_sticky.css ===== */
++
+ /* === TOPBAR: STICKY === */
++
+ .topbar{
+ position:sticky;
+ top:0;
+@@ -2476,7 +2504,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 12_topbar_mobile_figma.css ===== */
++
+ /* === TOPBAR: MOBILE (FIGMA) === */
++
+ @media (max-width: 768px){
+ .topbar__inner{
+ min-height:52px;
+@@ -2510,7 +2542,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 13_topbar_figma_tuning_desktop.css ===== */
++
+ /* === TOPBAR: FIGMA TUNING (DESKTOP) === */
++
+ .topbar__inner{
+ gap:18px;
+ }
+@@ -2542,7 +2578,11 @@
+ border:0;
+ }
+ 
++
++/* ===== FILE: 14_fix_global_spacing.css ===== */
++
+ /* ===== FIX GLOBAL SPACING ===== */
++
+ .site-main {
+ padding-top: 0 !important;
+ margin-top: 0 !important;
+@@ -2552,7 +2592,11 @@
+ margin-top: 0 !important;
+ }
+ 
++
++/* ===== FILE: 15_hero_fix.css ===== */
++
+ /* === HERO FIX === */
++
+ .hero {
+ padding-top: 24px !important;
+ padding-bottom: 32px !important;
+@@ -2607,7 +2651,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 16_pixel_perfect_base_figma.css ===== */
++
+ /* === PIXEL PERFECT BASE (FIGMA) === */
++
+ :root{
+ --container:1200px;
+ --pad:24px;
+@@ -2682,7 +2730,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 17_sticky_topbar_blur.css ===== */
++
+ /* === STICKY TOPBAR + BLUR === */
++
+ .topbar{
+ position:sticky;
+ top:0;
+@@ -2694,7 +2746,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 18_cards_hover.css ===== */
++
+ /* === CARDS: HOVER === */
++
+ .profile-card{
+ transition:transform .18s ease, box-shadow .18s ease;
+ will-change:transform;
+@@ -2715,7 +2771,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 19_fade_in_on_scroll.css ===== */
++
+ /* === FADE-IN ON SCROLL === */
++
+ .reveal{
+ opacity:0;
+ transform:translateY(10px);
+@@ -2730,7 +2790,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 20_skeleton.css ===== */
++
+ /* === SKELETON === */
++
+ .skeleton{
+ background:linear-gradient(90deg,#eee,#f7f7f7,#eee);
+ background-size:200% 100%;
+@@ -2757,7 +2821,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 21_cwv_reduce_cls_with_fixed_ratio.css ===== */
++
+ /* === CWV: reduce CLS with fixed ratio === */
++
+ .profile-card__img{
+ width:100%;
+ aspect-ratio: 3 / 4;
+@@ -2766,7 +2834,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 22_city_grid_fix_prevent_linked_first_card.css ===== */
++
+ /* === CITY GRID FIX: prevent “linked” first card === */
++
+ .home-city .city-row,
+ .home-city .profiles-row,
+ .home-city .city-grid,
+@@ -2857,7 +2929,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 23_city_promo_card_glued_like_figma.css ===== */
++
+ /* === CITY PROMO CARD (glued like Figma) === */
++
+ .cards-grid--city .profile-card--promo{
+ background:#ededed;
+ border-radius:18px;
+@@ -2877,7 +2953,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 24_home_city_figma_1_1.css ===== */
++
+ /* === HOME CITY (FIGMA 1:1) === */
++
+ display:grid !important;
+ grid-template-columns: 640px 1fr; /* широкий левый блок как в Figma */
+ gap:32px !important;
+@@ -2951,7 +3031,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 25_home_city_fix_prevent_overlap_figma_grid.css ===== */
++
+ /* === HOME CITY FIX (prevent overlap, Figma grid) === */
++
+ .home-city .container{overflow:hidden;}
+ display:grid !important;
+ grid-template-columns: 640px minmax(0,1fr) !important;
+@@ -2969,7 +3053,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 26_home_city_figma_1_1_fix.css ===== */
++
+ /* === HOME CITY (FIGMA 1:1 FIX) === */
++
+ .home-city .container{overflow:hidden;}
+ display:grid !important;
+ grid-template-columns: 640px minmax(0,1fr) !important;
+@@ -3194,7 +3282,11 @@
+ padding: 26px !important;
+ }
+ 
++
++/* ===== FILE: 27_important_kill_any_big_gray_wrapper_on_the_right_side.css ===== */
++
+ /* IMPORTANT: kill any "big gray wrapper" on the RIGHT side */
++
+ .home-city .city-grid > .cards-grid.cards-grid--city{
+ background: transparent !important;
+ border: 0 !important;
+@@ -3291,7 +3383,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 28_fix_promo_card_should_not_span_2_cols_rows_figma.css ===== */
++
+ /* === FIX: promo card should NOT span 2 cols/rows (Figma) === */
++
+ .cards-grid--city .profile-card--promo{
+ grid-column: auto !important;
+ grid-row: auto !important;
+@@ -3305,7 +3401,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 29_home_city_figma_grid_1v1_promo_cards.css ===== */
++
+ /* === HOME CITY: FIGMA GRID 1v1 (promo + cards) === */
++
+ display:grid !important;
+ grid-template-columns: repeat(4, minmax(0,1fr)) !important; /* как на Figma: плотная 4-колонка */
+ gap: 18px !important;
+@@ -3342,14 +3442,22 @@
+ }
+ 
+ 
++
++/* ===== FILE: 30_city_first_card_composite_figma.css ===== */
++
+ /* === CITY: FIRST CARD COMPOSITE (FIGMA) === */
++
+ display:grid !important;
+ grid-template-columns: repeat(4, minmax(0,1fr)) !important;
+ gap: 18px !important;
+ align-items: start !important;
+ }
+ 
++
++/* ===== FILE: 31_promo_spans_2_columns.css ===== */
++
+ /* PROMO spans 2 columns */
++
+ .home-city .profile-card--promo{
+ grid-column: 1 / span 2 !important;
+ display:grid;
+@@ -3484,7 +3592,11 @@
+ 
+ 
+ 
++
++/* ===== FILE: 32_home_city_promo_first_card_like_figma.css ===== */
++
+ /* === HOME CITY: PROMO FIRST CARD LIKE FIGMA === */
++
+ display:grid !important;
+ grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+ gap:18px !important;
+@@ -3702,7 +3814,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 33_city_promo_figma_fix_sizes.css ===== */
++
+ /* === CITY PROMO (FIGMA) – FIX SIZES === */
++
+ grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+ gap: 24px !important;
+ }
+@@ -3795,7 +3911,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 34_city_promo_size_tune_fix_too_tall.css ===== */
++
+ /* === CITY PROMO – SIZE TUNE (fix too tall) === */
++
+ @media (min-width: 769px){
+ .home-city .cards-grid--city .profile-card--promo{
+ min-height: 360px !important;
+@@ -3816,7 +3936,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 35_city_promo_figma_2_col_card_tighter_left_text.css ===== */
++
+ /* === CITY PROMO (FIGMA): 2-col card + tighter left text === */
++
+ grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+ }
+ 
+@@ -3893,8 +4017,12 @@
+ }
+ 
+ 
++
++/* ===== FILE: 36_promo_card_fix_auto.css ===== */
++
+ /* === PROMO CARD FIX (AUTO) === */
+ 
++
+ .home-city .cards-grid--city{grid-template-columns:repeat(3,1fr)}
+ 
+ .home-city .profile-card--promo{grid-column:1 / span 2;display:grid;grid-template-columns:360px 1fr;gap:24px;align-items:stretch;background:#ededed;border-radius:22px;overflow:hidden;}
+@@ -3914,7 +4042,11 @@
+ @media(max-width:1024px){.home-city .profile-card--promo{grid-column:1/-1;grid-template-columns:1fr}}
+ 
+ 
++
++/* ===== FILE: 37_personal_profile_layout_auto.css ===== */
++
+ /* === PERSONAL PROFILE LAYOUT (AUTO) === */
++
+ .pp-head{padding:24px 0;}
+ .pp-head__grid{
+ display:grid;
+@@ -3965,7 +4097,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 38_personal_profile_figma_override.css ===== */
++
+ /* === PERSONAL PROFILE (FIGMA OVERRIDE) === */
++
+ .pp-head{padding:24px 0;}
+ /* left sidebar */
+ /* photo card */
+@@ -4035,7 +4171,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 39_personal_profile_final_override_figma.css ===== */
++
+ /* === PERSONAL PROFILE FINAL OVERRIDE (FIGMA) === */
++
+ .page-template-page-personal-profile .container{max-width:1180px !important;}
+ .page-template-page-personal-profile .pp{padding-top:26px;}
+ .pp-head{margin-bottom:26px;}
+@@ -4108,7 +4248,11 @@
+ 
+ 
+ 
++
++/* ===== FILE: 40_pp_ui_kit_polish_photo_hover_gallery_tiles_mobile_swipe.css ===== */
++
+ /* === PP UI Kit polish + Photo hover + Gallery tiles + Mobile swipe === */
++
+ :root{
+ --pp-gap:24px;
+ --pp-gap-sm:14px;
+@@ -4162,7 +4306,11 @@
+ transition:transform .15s ease, box-shadow .15s ease, background .15s ease !important;
+ }
+ 
++
++/* ===== FILE: 41_gallery_tiles_like_figma.css ===== */
++
+ /* GALLERY: tiles like Figma */
++
+ .pp-gallery{display:grid !important;grid-template-columns:repeat(3,minmax(0,1fr)) !important;gap:14px !important;margin-top:14px !important;}
+ .pp-gallery-item{border-radius:18px !important;overflow:hidden !important;background-size:cover !important;background-position:center !important;aspect-ratio:1/1 !important;position:relative !important;box-shadow:0 10px 26px rgba(0,0,0,.06) !important;}
+ .pp-gallery-open{position:absolute !important;inset:0 !important;z-index:1 !important;}
+@@ -4189,7 +4337,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 42_active_profiles_block_figma.css ===== */
++
+ /* === Active profiles block (Figma) === */
++
+ .pp-active{background:#3a3a3a !important;border-radius:22px !important;padding:22px !important;margin:24px 0 34px !important;}
+ .pp-active__title{color:#fff !important;margin:0 0 16px !important;font-size:18px !important;font-weight:900 !important;}
+ .pp-active__grid{display:grid !important;grid-template-columns:repeat(3,minmax(0,1fr)) !important;gap:18px !important;}
+@@ -4216,7 +4368,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 43_card_stats_likes_views_rating.css ===== */
++
+ /* === Card stats (likes / views / rating) === */
++
+ .pp-active-stats{
+ display:flex !important;
+ gap:14px !important;
+@@ -4239,7 +4395,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 44_main_photo_picker_modal.css ===== */
++
+ /* === Main photo picker modal === */
++
+ .pp-modal{position:fixed;inset:0;display:none;z-index:9999;}
+ .pp-modal.is-open{display:block;}
+ .pp-modal__backdrop{position:absolute;inset:0;background-color:rgba(0,0,0,.45);}
+@@ -4255,7 +4415,11 @@
+ }
+ 
+ 
++
++/* ===== FILE: 45_pp_overrides_remove_pencil_realistic_button.css ===== */
++
+ /* === PP overrides: remove pencil + realistic button === */
++
+ .pp-photo::after{content:none !important;opacity:0 !important;display:none !important;}
+ 
+ .pp-photo__cta{
+@@ -4280,12 +4444,20 @@
+ .pp-photo__cta:focus-visible{outline:3px solid rgba(0,0,0,.18) !important;outline-offset:3px !important;}
+ 
+ 
++
++/* ===== FILE: 46_fix_make_change_photo_button_clickable.css ===== */
++
+ /* === Fix: make Change Photo button clickable === */
++
+ .pp-photo::before{pointer-events:none !important;}
+ .pp-photo__cta{z-index:9999 !important;pointer-events:auto !important;}
+ 
+ 
++
++/* ===== FILE: 47_single_profile_figma_layout_fix.css ===== */
++
+ /* === Single Profile (Figma) layout fix === */
++
+ .single-profile .container{max-width:1200px !important;}
+ .sp-head{display:grid !important;grid-template-columns:1.35fr .65fr !important;gap:24px !important;align-items:start !important;margin:22px 0 18px !important;}
+ .sp-hero img{width:100% !important;height:100% !important;object-fit:cover !important;display:block !important;}
+@@ -4309,7 +4481,11 @@
+ 
+ 
+ 
++
++/* ===== FILE: 48_single_profile_ui_kit_gallery_1_2_badges_tabs.css ===== */
++
+ /* === Single Profile UI Kit: gallery(1+2) + badges + tabs === */
++
+ body.single-profile .sp-gallery-wrap{position:relative !important;}
+ 
+ /* Desktop: 1 big + 2 small */

@@ -1,0 +1,67 @@
+/* ===== Personal Profile: Upload UI ===== */
+
+
+.pp-upload-form { margin: 12px 0 18px; }
+
+.pp-upload-row{
+display:flex;
+align-items:center;
+gap:14px;
+flex-wrap:wrap;
+}
+
+.pp-file-btn{
+display:inline-flex;
+align-items:center;
+justify-content:center;
+padding:10px 16px;
+border:1px solid #d7d7d7;
+border-radius:999px;
+background:#fff;
+cursor:pointer;
+font-weight:600;
+line-height:1;
+transition:.2s ease;
+user-select:none;
+}
+
+.pp-file-btn:hover{
+border-color:#111;
+}
+
+.pp-files-label{
+font-size:14px;
+color:#777;
+min-width:140px;
+}
+
+.pp-upload-submit{
+border-radius:999px;
+padding:12px 22px;
+}
+
+/* Gallery grid (аккуратно) */
+.pp-gallery{
+display:grid;
+grid-template-columns:repeat(3, minmax(0, 1fr));
+gap:14px;
+margin-top:14px;
+}
+
+@media (max-width: 900px){
+
+.pp-gallery{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px){
+.pp-gallery{ grid-template-columns:1fr; }
+}
+
+.pp-gallery-item{
+display:block;
+border-radius:16px;
+overflow:hidden;
+background-size:cover;
+background-position:center;
+aspect-ratio: 1 / 1.15;
+}
+

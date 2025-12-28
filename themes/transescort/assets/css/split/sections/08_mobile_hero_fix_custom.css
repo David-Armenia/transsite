@@ -1,0 +1,15 @@
+/* === MOBILE HERO FIX (CUSTOM) === */
+
+.hero .hero-preview {
+height: 200px !important;
+}
+
+.hero .hero-right .hero-bg {
+height: 280px !important;
+}
+
+.hero .hero-inner {
+gap: 12px !important;
+}
+
+

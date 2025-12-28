@@ -1,0 +1,74 @@
+/* === FIX HEADER LAYOUT === */
+
+
+.topbar {
+padding: 8px 0 !important;
+background: #fff;
+}
+
+.topbar__inner {
+display: flex;
+align-items: center;
+gap: 16px;
+min-height: 56px;
+}
+
+/* Лого */
+.topbar__logo {
+font-size: 26px;
+font-weight: 800;
+line-height: 1;
+}
+
+/* Поиск */
+.topbar__search {
+max-width: 360px;
+height: 40px;
+padding: 0 14px;
+display: flex;
+align-items: center;
+gap: 10px;
+border-radius: 999px;
+background: #f3f3f3;
+}
+
+.topbar__search input {
+height: 100%;
+border: none;
+background: transparent;
+outline: none;
+font-size: 14px;
+}
+
+/* Кнопки справа */
+.topbar__actions {
+display: flex;
+align-items: center;
+gap: 12px;
+margin-left: auto;
+}
+
+.topbar__btn {
+height: 38px;
+padding: 0 18px;
+border-radius: 999px;
+font-size: 14px;
+}
+
+/* Убираем лишние отступы сверху */
+body {
+padding-top: 0 !important;
+}
+
+/* Мобилка */
+@media (max-width: 768px) {
+.topbar__search {
+max-width: 100%;
+}
+
+.topbar__btn {
+display: none;
+}
+}
+
+

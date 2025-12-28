@@ -1,0 +1,43 @@
+/* === RECOMMENDATIONS SIZE FIX (FIGMA) === */
+
+.home-recommend .recommend-row{
+display:flex !important;
+gap:16px !important;
+overflow-x:auto !important;
+padding-bottom:6px !important;
+scroll-snap-type:x mandatory !important;
+}
+.home-recommend .recommend-row::-webkit-scrollbar{
+height:6px;
+}
+.home-recommend .profile-card{
+flex:0 0 260px !important;
+scroll-snap-align:start !important;
+background:#fff !important;
+border-radius:18px !important;
+overflow:hidden !important;
+text-decoration:none !important;
+}
+.home-recommend .profile-card img{
+width:100% !important;
+height:190px !important;
+object-fit:cover !important;
+display:block !important;
+}
+.home-recommend .profile-card__info{
+padding:10px 12px !important;
+}
+.home-recommend .profile-card__name{
+font-weight:700 !important;
+font-size:14px !important;
+line-height:1.2 !important;
+}
+@media (max-width: 768px){
+.home-recommend .profile-card{
+flex-basis:220px !important;
+}
+.home-recommend .profile-card img{
+height:170px !important;
+}
+}
+

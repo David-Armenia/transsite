@@ -1,0 +1,63 @@
+/* === HERO SIZES OVERRIDE (FIGMA) === */
+
+.hero .hero-inner{
+display:grid !important;
+grid-template-columns: 360px 1fr !important;
+gap:24px !important;
+align-items:start !important;
+}
+
+/* LEFT preview image (small card) */
+.hero .hero-preview{
+display:block !important;
+margin-top:16px !important;
+border-radius:24px !important;
+overflow:hidden !important;
+position:relative !important;
+width:100% !important;
+height:210px !important;
+}
+.hero .hero-preview img{
+width:100% !important;
+height:100% !important;
+object-fit:cover !important;
+object-position:center !important;
+display:block !important;
+}
+
+/* RIGHT banner image (big) */
+.hero .hero-right{
+position:relative !important;
+}
+.hero .hero-right .hero-bg{
+position:relative !important;
+width:100% !important;
+height:360px !important;
+border-radius:28px !important;
+overflow:hidden !important;
+}
+.hero .hero-right .hero-bg img{
+width:100% !important;
+height:100% !important;
+object-fit:cover !important;
+object-position:center !important;
+display:block !important;
+}
+
+/* Mobile */
+@media (max-width: 768px){
+.hero .hero-inner{
+grid-template-columns:1fr !important;
+gap:16px !important;
+}
+.hero .hero-preview{
+height:170px !important;
+border-radius:20px !important;
+}
+.hero .hero-right .hero-bg{
+height:260px !important;
+border-radius:22px !important;
+}
+}
+
+

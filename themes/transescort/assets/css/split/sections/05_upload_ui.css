@@ -1,0 +1,229 @@
+/* ===== Upload UI ===== */
+
+
+.pp-upload-form {
+margin: 16px 0;
+}
+
+.pp-upload-row {
+display: flex;
+gap: 12px;
+align-items: center;
+flex-wrap: wrap;
+}
+
+/* Choose files */
+.pp-upload-select {
+padding: 12px 18px;
+border-radius: 999px;
+border: 2px dashed #bbb;
+cursor: pointer;
+font-weight: 600;
+color: #222;
+transition: all .2s ease;
+background: #fff;
+}
+
+.pp-upload-select:hover {
+border-color: #111;
+background: #f7f7f7;
+}
+
+/* Upload button */
+.pp-upload-btn {
+padding: 12px 26px;
+border-radius: 999px;
+border: none;
+cursor: pointer;
+font-weight: 600;
+background: #1f1f1f;
+color: #fff;
+transition: 0.2s ease;
+}
+
+.pp-upload-btn:hover {
+background: #000;
+}
+
+.pp-upload-select {
+box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+.pp-upload-btn {
+background: #111;
+color: #fff;
+box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+/* полностью скрываем стандартный file input */
+.pp-upload-select input[type="file"] {
+display: none;
+}
+
+/* кнопка выбора файлов */
+.pp-upload-select {
+display: inline-flex;
+align-items: center;
+justify-content: center;
+padding: 12px 20px;
+border-radius: 999px;
+background: #f2f2f2;
+border: 2px solid #ddd;
+font-weight: 600;
+cursor: pointer;
+transition: 0.2s ease;
+}
+
+.pp-upload-select:hover {
+background: #eee;
+border-color: #000;
+}
+
+/* кнопка отправки */
+.pp-upload-btn {
+margin-left: 12px;
+padding: 12px 26px;
+border-radius: 999px;
+border: none;
+background: #111;
+color: #fff;
+font-weight: 600;
+cursor: pointer;
+}
+
+.pp-upload-btn:hover {
+background: #000;
+}
+
+.pp-gallery-item{
+position: relative;
+border-radius:16px;
+overflow:hidden;
+}
+
+.pp-gallery-open{
+position:absolute;
+inset:0;
+display:block;
+}
+
+/* delete overlay */
+.pp-photo-del-form{
+position:absolute;
+top:10px;
+right:10px;
+opacity:0;
+transform: translateY(-4px);
+transition: .15s ease;
+z-index: 2;
+}
+
+.pp-gallery-item:hover .pp-photo-del-form{
+opacity:1;
+transform: translateY(0);
+}
+
+.pp-photo-del-btn{
+border:0;
+border-radius:999px;
+padding:8px 12px;
+cursor:pointer;
+font-weight:600;
+background-color: rgba(0,0,0,0.65);
+color:#fff;
+backdrop-filter: blur(6px);
+}
+
+.pp-photo-del-btn:hover{
+background-color: rgba(0,0,0,0.85);
+}
+
+.profile-gallery{
+display:grid;
+grid-template-columns:repeat(3, minmax(0, 1fr));
+gap:14px;
+margin-top:16px;
+}
+.profile-gallery-item{
+display:block;
+border-radius:16px;
+overflow:hidden;
+background-size:cover;
+background-position:center;
+aspect-ratio: 1 / 1.15;
+}
+@media (max-width: 900px){
+
+.profile-gallery{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px){
+.profile-gallery{ grid-template-columns:1fr; }
+}
+
+
+/* Request result (success/error) */
+.request-result{
+padding: 12px 14px;
+border-radius: 12px;
+font-weight: 600;
+}
+.request-result.is-success{
+background: #e9f8ee;
+border: 1px solid #bde5c8;
+color: #1d6b34;
+}
+.request-result.is-error{
+background: #ffecec;
+border: 1px solid #f5b5b5;
+color: #8a1f1f;
+}
+
+/* =========================
+Personal Profile: City select
+========================= */
+.pp-right .pp-card .pp-info-row + select,
+.pp-right .pp-card select[name="profile_city"]{
+width: 100%;
+margin-top: 10px;
+padding: 14px 16px;
+border-radius: 14px;
+border: 1px solid rgba(0,0,0,.18);
+background: #fff;
+font: inherit;
+outline: none;
+-webkit-appearance: none;
+appearance: none;
+background-image:
+linear-gradient(45deg, transparent 50%, #111 50%),
+linear-gradient(135deg, #111 50%, transparent 50%);
+background-position:
+calc(100% - 22px) 50%,
+calc(100% - 16px) 50%;
+background-size: 6px 6px, 6px 6px;
+background-repeat: no-repeat;
+}
+
+.pp-right .pp-card select[name="profile_city"]:focus{
+border-color: rgba(0,0,0,.45);
+box-shadow: 0 0 0 3px rgba(0,0,0,.08);
+}
+
+.pp-right .pp-card .pp-alert{
+border-radius: 14px;
+padding: 12px 14px;
+border: 1px solid rgba(0,0,0,.12);
+}
+
+.pp-right .pp-card .pp-alert--success{
+background: #eaf7ee;
+}
+
+.pp-right .pp-card .pp-alert--error{
+background: #fdecec;
+}
+
+/* make the Save button align nicely under select */
+.pp-right .pp-card form .btn{
+width: 100%;
+}
+
+

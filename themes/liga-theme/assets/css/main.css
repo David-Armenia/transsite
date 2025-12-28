@@ -1,0 +1,117 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: #ffffff;
+  color: #353537;
+}
+
+h1, h2, h3 {
+  font-family: 'Bagel Fat One', cursive;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* HEADER */
+.site-header {
+  border-bottom: 1px solid #efefef;
+  padding: 20px 0;
+}
+
+.header-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.main-nav ul {
+  display: flex;
+  gap: 24px;
+  list-style: none;
+}
+
+/* HERO */
+.hero {
+  background: #efefef;
+  padding: 80px 0;
+}
+
+.hero h1 {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.hero p {
+  max-width: 500px;
+  margin-bottom: 24px;
+}
+
+.btn-primary {
+  background: #353537;
+  color: white;
+  padding: 14px 28px;
+  border-radius: 12px;
+  display: inline-block;
+}
+
+/* GRID SECTIONS */
+.section {
+  padding: 80px 0;
+}
+
+.section h2 {
+  font-size: 36px;
+  margin-bottom: 32px;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #efefef;
+  padding: 16px;
+}
+
+.card img {
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.card h3 {
+  font-size: 20px;
+}
+
+/* FOOTER */
+.site-footer {
+  background: #353537;
+  color: white;
+  padding: 40px 0;
+  margin-top: 80px;
+}
+
+/* MOBILE */
+@media (max-width: 900px) {
+  .card-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .card-grid {
+    grid-template-columns: 1fr;
+  }
+}

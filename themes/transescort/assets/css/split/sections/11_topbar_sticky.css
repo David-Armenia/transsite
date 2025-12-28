@@ -1,0 +1,13 @@
+/* === TOPBAR: STICKY === */
+
+.topbar{
+position:sticky;
+top:0;
+z-index:9999;
+}
+/* чтобы контент не прилипал вплотную */
+.site-main{
+padding-top:16px;
+}
+
+

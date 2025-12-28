@@ -1,0 +1,565 @@
+/* ============ SINGLE PROFILE — FIGMA FINAL (OVERRIDE) ============ */
+.sp-fav.is-active{ background:rgba(0,0,0,.12); }
+
+/* === PROFILE TOP (FINAL) === */
+.single-profile .sp-top{display:grid;grid-template-columns:1.6fr 1fr;gap:24px;align-items:stretch;margin-bottom:22px;}
+.single-profile .sp-hero{position:relative;height:520px;border-radius:28px;overflow:hidden;background:#eee;}
+.single-profile .sp-hero-img{width:100%;height:100%;object-fit:cover;display:block;}
+.single-profile .sp-side{display:grid;grid-template-rows:1fr 1fr;gap:20px;}
+.single-profile .sp-side-item{border-radius:24px;overflow:hidden;background-size:cover;background-position:center;background-color:#eee;}
+@media (max-width:900px){
+  .single-profile .sp-top{grid-template-columns:1fr;}
+  .single-profile .sp-hero{height:360px;}
+  .single-profile .sp-side{grid-template-columns:1fr 1fr;grid-template-rows:auto;gap:12px;}
+}
+
+/* ============ SINGLE PROFILE — RESPONSIVE + POLISH ============ */
+.single-profile .sp-top{
+  grid-template-columns: minmax(0, 1fr) 320px !important;
+  gap: 24px !important;
+}
+
+@media (max-width: 1100px){
+  .single-profile .sp-top{ grid-template-columns: minmax(0,1fr) 300px !important; }
+  .single-profile .sp-hero{ height: 500px !important; min-height: 500px !important; }
+  .single-profile .sp-side-item{ height: calc((500px - 18px)/2) !important; }
+}
+
+@media (max-width: 900px){
+  .single-profile .sp-top{
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  .single-profile .sp-hero{
+    height: 420px !important;
+    min-height: 420px !important;
+    border-radius: 24px !important;
+  }
+  .single-profile .sp-side{
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+  .single-profile .sp-side-item{
+    height: 180px !important;
+    border-radius: 18px !important;
+  }
+}
+
+/* Mobile like Figma: one big + two small under */
+@media (max-width: 520px){
+  .single-profile .sp-hero{
+    height: 360px !important;
+    min-height: 360px !important;
+    border-radius: 20px !important;
+  }
+  .single-profile .sp-side{
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+  }
+  .single-profile .sp-side-item{
+    height: 150px !important;
+    border-radius: 16px !important;
+  }
+}
+
+/* Make images cover nicely */
+.single-profile .sp-hero-img{
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  display: block !important;
+}
+
+/* clickable thumbs */
+.single-profile .sp-hero,
+.single-profile .sp-side-item{ cursor: pointer; }
+
+
+/* ============ SINGLE PROFILE — GALLERY GRID ============ */
+.single-profile .sp-gallery{
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 14px;
+}
+@media (max-width: 1100px){ .single-profile .sp-gallery{ grid-template-columns: repeat(5, 1fr); } }
+@media (max-width: 900px){  .single-profile .sp-gallery{ grid-template-columns: repeat(3, 1fr); gap: 12px; } }
+@media (max-width: 520px){  .single-profile .sp-gallery{ grid-template-columns: repeat(2, 1fr); gap: 10px; } }
+
+.single-profile .sp-gitem{
+  border: 0;
+  padding: 0;
+  border-radius: 18px;
+  overflow: hidden;
+  background-color: rgba(0,0,0,.06);
+  background-size: cover;
+  background-position: center;
+  aspect-ratio: 1 / 1;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+.single-profile .sp-gitem:hover{ transform: translateY(-2px); filter: brightness(1.03); }
+.single-profile .sp-gitem:active{ transform: translateY(0); }
+
+/* ============ LIGHTBOX ============ */
+.te-lb{
+  position: fixed; inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,.72);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.te-lb.is-open{ display: flex; }
+
+.te-lb__panel{
+  width: min(980px, 100%);
+  background: rgba(20,20,20,.9);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0 20px 80px rgba(0,0,0,.35);
+}
+
+.te-lb__img{
+  width: 100%;
+  height: min(74vh, 720px);
+  object-fit: contain;
+  display: block;
+  background: #111;
+}
+
+.te-lb__close,
+.te-lb__prev,
+.te-lb__next{
+  position: absolute;
+  top: 14px;
+  border: 0;
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  border-radius: 12px;
+  padding: 10px 12px;
+  cursor: pointer;
+  transition: transform .15s ease, background .15s ease;
+}
+.te-lb__close{ right: 14px; }
+.te-lb__prev{ left: 14px; top: 50%; transform: translateY(-50%); }
+.te-lb__next{ right: 14px; top: 50%; transform: translateY(-50%); }
+.te-lb__close:hover,
+.te-lb__prev:hover,
+.te-lb__next:hover{ background: rgba(255,255,255,.18); }
+.te-lb__close:active,
+.te-lb__prev:active,
+.te-lb__next:active{ transform: translateY(-50%) scale(.98); }
+
+.te-lb__count{
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  color: rgba(255,255,255,.92);
+  font-size: 14px;
+  background: rgba(255,255,255,.12);
+  padding: 8px 10px;
+  border-radius: 12px;
+}
+
+/* reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .single-profile .sp-gitem,
+  .te-lb__close,
+  .te-lb__prev,
+  .te-lb__next{ transition: none !important; }
+  .single-profile .sp-gitem:hover{ transform: none; }
+}
+
+
+/* ============ SINGLE PROFILE — RIGHT CARD ALIGN (FIGMA) ============ */
+
+/* общий грид страницы: слева блок фото, справа карточка */
+.single-profile .profile-grid{
+  align-items: start !important;
+}
+
+/* правый столбец */
+.single-profile .profile-right{
+  display: block !important;
+}
+
+/* сама карточка справа: фикс высота как у hero (540) */
+.single-profile .profile-right .profile-card,
+.single-profile .profile-right .sp-card,
+.single-profile .profile-right .profile-info-card{
+  height: 540px !important;
+  min-height: 540px !important;
+
+  display: flex !important;
+  flex-direction: column !important;
+
+  padding: 26px !important;
+  border-radius: 28px !important;
+}
+
+/* на планшете чуть ниже */
+@media (max-width: 900px){
+  .single-profile .profile-right .profile-card,
+  .single-profile .profile-right .sp-card,
+  .single-profile .profile-right .profile-info-card{
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 18px !important;
+    border-radius: 24px !important;
+  }
+}
+
+/* “низ карточки” (кнопки) — всегда вниз */
+.single-profile .profile-right .profile-actions,
+.single-profile .profile-right .sp-actions,
+.single-profile .profile-right .profile-buttons{
+  margin-top: auto !important;
+}
+
+/* аккуратные отступы между секциями */
+.single-profile .profile-right .profile-card > * + *,
+.single-profile .profile-right .sp-card > * + *,
+.single-profile .profile-right .profile-info-card > * + *{
+  margin-top: 14px !important;
+}
+
+/* выравнивание “чипсов/параметров” */
+.single-profile .profile-right .sp-pills,
+.single-profile .profile-right .profile-pills,
+.single-profile .profile-right .profile-sizes{
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+}
+
+/* блоки “цена/условия” в две колонки */
+.single-profile .profile-right .sp-prices,
+.single-profile .profile-right .profile-prices{
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 12px !important;
+}
+
+@media (max-width: 520px){
+  .single-profile .profile-right .sp-prices,
+  .single-profile .profile-right .profile-prices{
+    grid-template-columns: 1fr !important;
+  }
+}
+
+.single-profile .profile-right > * + *{ margin-top:14px !important; }
+
+/* ============ SINGLE PROFILE — GRID FIX (NO OVERFLOW) ============ */
+.single-profile .profile-grid{
+  display:grid !important;
+  grid-template-columns:minmax(0,1fr) 420px !important;
+  gap:24px !important;
+  align-items:start !important;
+}
+/* важно: иначе колонка может “вылезать” */
+.single-profile .profile-left,
+.single-profile .profile-right{
+  min-width:0 !important;
+}
+/* правая колонка строго в пределах */
+.single-profile .profile-right{
+  width:100% !important;
+  max-width:420px !important;
+  justify-self:end !important;
+  overflow:hidden !important;
+}
+/* ============ SINGLE PROFILE — RIGHT CARD (PROFILE-SUMMARY) ============ */
+.single-profile .profile-right .profile-summary{
+  background:#f3f3f3 !important;
+  border-radius:28px !important;
+  padding:26px !important;
+  box-shadow:0 20px 50px rgba(0,0,0,.08) !important;
+  height:540px !important;
+  min-height:540px !important;
+  display:flex !important;
+  flex-direction:column !important;
+  box-sizing:border-box !important;
+}
+/* кнопки вниз */
+.single-profile .profile-right .sp-actions{
+  margin-top:auto !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:12px !important;
+}
+/* ссылка “Редактировать профиль” тоже вниз и красиво */
+.single-profile .profile-right .profile-summary > a.btn{
+  margin-top:12px !important;
+}
+/* чуть аккуратнее отступы */
+.single-profile .profile-right .profile-summary > * + *{
+  margin-top:14px !important;
+}
+/* адаптив */
+@media (max-width:900px){
+  .single-profile .profile-right .profile-summary{
+    height:auto !important;
+    min-height:0 !important;
+    padding:18px !important;
+    border-radius:24px !important;
+  }
+}
+
+
+/* ============ SINGLE PROFILE — RIGHT CARD INSIDE (FIGMA) ============ */
+/* шапка: имя слева, избранное справа, город на новой строке */
+.single-profile .profile-right .profile-summary .sp-head{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  align-items:flex-start !important;
+  justify-content:space-between !important;
+  gap:12px 14px !important;
+}
+.single-profile .profile-right .profile-summary .profile-name{
+  margin:0 !important;
+  font-size:44px !important;
+  line-height:1.05 !important;
+  font-weight:800 !important;
+  order:1 !important;
+}
+.single-profile .profile-right .profile-summary .sp-fav{
+  order:2 !important;
+  margin-left:auto !important;
+  align-self:flex-start !important;
+  background:#e9e9e9 !important;
+  border:0 !important;
+  border-radius:18px !important;
+  padding:10px 14px !important;
+  font-weight:600 !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  gap:8px !important;
+  cursor:pointer !important;
+}
+.single-profile .profile-right .profile-summary .profile-city{
+  order:3 !important;
+  width:100% !important;
+  margin-top:6px !important;
+  color:rgba(0,0,0,.55) !important;
+  font-size:16px !important;
+}
+
+/* контакты */
+.single-profile .profile-right .profile-summary .sp-contacts{
+  display:flex !important;
+  gap:10px !important;
+}
+.single-profile .profile-right .profile-summary .sp-icon-btn{
+  width:46px !important;
+  height:46px !important;
+  border-radius:16px !important;
+  background:#e7e7e7 !important;
+  display:inline-flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  text-decoration:none !important;
+  font-weight:700 !important;
+}
+
+/* цена */
+.single-profile .profile-right .profile-summary .profile-price{
+  font-size:56px !important;
+  font-weight:900 !important;
+  letter-spacing:-0.02em !important;
+  line-height:1 !important;
+}
+
+/* размеры — “пилюли” */
+.single-profile .profile-right .profile-summary .sp-sizes{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:10px !important;
+}
+.single-profile .profile-right .profile-summary .sp-sizes .sp-chip{
+  border:0 !important;
+  background:#e2e2e2 !important;
+  border-radius:999px !important;
+  padding:10px 14px !important;
+  font-weight:700 !important;
+  cursor:default !important;
+}
+
+/* выезд/апартаменты — 2 колонки как в фигме */
+.single-profile .profile-right .profile-summary .sp-services{
+  display:grid !important;
+  grid-template-columns:1fr 1fr !important;
+  gap:12px !important;
+}
+.single-profile .profile-right .profile-summary .sp-service{
+  background:#e9e9e9 !important;
+  border-radius:18px !important;
+  padding:14px 16px !important;
+}
+.single-profile .profile-right .profile-summary .sp-service-title{
+  font-weight:800 !important;
+  margin-bottom:6px !important;
+}
+.single-profile .profile-right .profile-summary .sp-service-meta{
+  color:rgba(0,0,0,.6) !important;
+  font-weight:600 !important;
+}
+@media (max-width:520px){
+  .single-profile .profile-right .profile-summary .sp-services{grid-template-columns:1fr !important;}
+}
+
+/* кнопки: одинаковая ширина/радиусы */
+.single-profile .profile-right .profile-summary .sp-actions .btn{
+  width:100% !important;
+  border-radius:18px !important;
+  padding:16px 18px !important;
+  font-weight:800 !important;
+}
+
+
+/* ================= MOBILE FIX: PHOTO FIRST ================= */
+
+/* Перестраиваем сетку на мобильных */
+@media (max-width: 768px) {
+
+  .single-profile .profile-grid {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* фото блок выше инфо */
+  .single-profile .profile-left {
+    order: 1 !important;
+    width: 100% !important;
+  }
+
+  .single-profile .profile-right {
+    order: 2 !important;
+    width: 100% !important;
+    margin-top: 16px !important;
+  }
+
+  /* сама фотосекция */
+  .single-profile .sp-top {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  /* главное фото */
+  .single-profile .sp-hero {
+    height: auto !important;
+    aspect-ratio: 4 / 5 !important;
+    border-radius: 22px !important;
+  }
+
+  /* миниатюры под фото */
+  .single-profile .sp-side {
+    display: flex !important;
+    gap: 12px !important;
+  }
+
+  .single-profile .sp-side-item {
+    flex: 1 1 0 !important;
+    height: auto !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 16px !important;
+  }
+
+  /* правая карточка */
+  .single-profile .profile-summary {
+    padding: 18px !important;
+    border-radius: 22px !important;
+  }
+}
+
+
+/* ============ SINGLE PROFILE — BUTTONS LIKE FIGMA ============ */
+.single-profile .sp-actions{
+  margin-top:auto !important;
+  display:flex !important;
+  flex-direction:column !important;
+  gap:14px !important;
+}
+
+.single-profile .sp-actions .btn{
+  width:100% !important;
+  height:64px !important;
+  border-radius:18px !important;
+  font-weight:700 !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+  gap:10px !important;
+  line-height:1 !important;
+}
+
+.single-profile .sp-actions .btn.btn-secondary{
+  background:#111 !important;
+  color:#fff !important;
+  border:0 !important;
+}
+
+.single-profile .sp-actions .btn.btn-primary{
+  background:#111 !important;
+  color:#fff !important;
+  border:0 !important;
+}
+
+/* ссылка "Редактировать профиль" тоже как кнопка */
+.single-profile .profile-right .profile-summary > a.btn{
+  width:100% !important;
+  height:64px !important;
+  border-radius:18px !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+/* ============ SINGLE PROFILE — STICKY RIGHT CARD (DESKTOP) ============ */
+@media (min-width: 1024px){
+  .single-profile .profile-right{
+    position: sticky !important;
+    top: 110px !important; /* под хедер, при необходимости поменяем */
+    align-self: start !important;
+  }
+}
+
+/* ============ SINGLE PROFILE — SWIPE GALLERY (MOBILE) ============ */
+/* Предполагаем что элементы галереи: .sp-gallery и .sp-gitem (у тебя уже встречалось в CSS) */
+@media (max-width: 900px){
+  .single-profile .sp-gallery{
+    display:flex !important;
+    gap:12px !important;
+    overflow-x:auto !important;
+    overflow-y:hidden !important;
+    scroll-snap-type:x mandatory !important;
+    -webkit-overflow-scrolling:touch !important;
+    padding-bottom:6px !important;
+  }
+  .single-profile .sp-gallery::-webkit-scrollbar{ display:none !important; }
+
+  .single-profile .sp-gitem{
+    flex:0 0 auto !important;
+    width: 72vw !important;
+    max-width: 360px !important;
+    scroll-snap-align:start !important;
+    border-radius:18px !important;
+    overflow:hidden !important;
+    transform: translateZ(0);
+    transition: transform .25s ease, opacity .25s ease !important;
+    opacity:.95;
+  }
+
+  .single-profile .sp-gitem.is-inview{
+    transform: scale(1.00) !important;
+    opacity:1 !important;
+  }
+
+  .single-profile .sp-gallery.is-dragging .sp-gitem{
+    transition:none !important;
+  }
+}
+

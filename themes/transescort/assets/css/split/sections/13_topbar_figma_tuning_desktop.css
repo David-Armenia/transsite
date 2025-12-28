@@ -1,0 +1,33 @@
+/* === TOPBAR: FIGMA TUNING (DESKTOP) === */
+
+.topbar__inner{
+gap:18px;
+}
+.topbar__search{
+height:42px;
+padding:0 16px;
+background:#f1f1f1;
+}
+.topbar__search-ico{
+opacity:.6;
+}
+.topbar__actions{
+gap:14px;
+}
+.topbar__icon{
+background:#f1f1f1;
+}
+/* кнопки как в макете */
+.topbar__actions .btn{
+border-radius:999px;
+}
+.topbar__actions .btn.topbar__btn:not(.btn-primary){
+background:#fff;
+border:1px solid rgba(0,0,0,.12);
+}
+.topbar__actions .btn.btn-primary.topbar__btn{
+background:#2b2b2b;
+color:#fff;
+border:0;
+}
+

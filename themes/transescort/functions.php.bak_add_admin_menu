@@ -182,17 +182,6 @@ function te_profile_gallery_metabox($post){
 }
 
 
-add_action("admin_menu", function () {
-  add_options_page(
-    "Cities",
-    "Cities",
-    "manage_options",
-    "transescort-cities",
-    "transescort_cities_settings_page"
-  );
-});
-
-
 function transescort_cities_settings_page() {
     if (!current_user_can("manage_options")) return;
 

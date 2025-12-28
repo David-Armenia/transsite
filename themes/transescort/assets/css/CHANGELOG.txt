@@ -1,0 +1,13 @@
+Changelog (2025-12-28)
+
+Single Profile (Figma):
+- Removed duplicated "RIGHT CARD (FIX v2)" block.
+- Removed duplicated/empty ".profile-right .profile-summary" blocks; kept one base block + one mobile override.
+- Kept "GRID FIX (NO OVERFLOW)", "PROFILE-SUMMARY", and "SWIPE GALLERY (MOBILE)" sections.
+
+Build / Structure:
+- Split main.css into split/layout.css + split/profile.css.
+- Built dist.css (layout + profile) and dist.min.css (trim trailing spaces + remove empty lines).
+
+Notes:
+- No aggressive CSS minification performed (safe formatting-only min).

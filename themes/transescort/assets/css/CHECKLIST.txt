@@ -1,0 +1,15 @@
+CHECKLIST (Auto build)
+
+1) layout.css разбит на логические секции:
+   - split/sections/NN_*.css
+   - split/layout.bundled.css собран из секций
+
+2) dist.css пересобран:
+   - dist.css = split/layout.bundled.css + split/profile.css
+
+3) dist.min.css:
+   - через csso-cli (лучше) или безопасный trimming
+
+4) Что изменилось:
+   - изменение структуры (файлы/порядок), а НЕ логики CSS
+   - упрощает поддержку, позволяет точечно править блоки, легче искать дубли

@@ -1,0 +1,35 @@
+/* === TOPBAR: MOBILE (FIGMA) === */
+
+@media (max-width: 768px){
+.topbar__inner{
+min-height:52px;
+padding:10px 0;
+gap:10px;
+}
+.topbar__logo{
+font-size:18px;
+max-width:120px;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:ellipsis;
+}
+.topbar__search{
+max-width:none;
+flex:1;
+height:38px;
+padding:0 12px;
+}
+.topbar__actions{
+gap:8px;
+}
+.topbar__icon{
+width:32px;
+height:32px;
+font-size:14px;
+}
+.topbar__btn{
+display:none !important;
+}
+}
+
+
