@@ -1,0 +1,55 @@
+<?php
+$profile_id = get_the_ID();
+
+$price    = get_post_meta($profile_id, '_profile_price', true);
+$city     = get_post_meta($profile_id, '_profile_city', true);
+$verified = get_post_meta($profile_id, '_profile_verified', true);
+$is_verified = ($verified === '1');
+
+$thumb_url = transescort_get_profile_image_url($profile_id, 'large');
+
+  // Favorite state (catalog card)
+  $fav_active = false;
+  $fav_nonce  = wp_create_nonce("te_fav_profile");
+  if (is_user_logged_in()) {
+    $fav_ids = get_user_meta(get_current_user_id(), "_favorite_profile_ids", true);
+    if (is_array($fav_ids)) {
+      $fav_active = in_array((int)$profile_id, array_map("intval", $fav_ids), true);
+    }
+  }
+
+?>
+
+<article class="profile-card">
+  <a class="profile-card__media" href="<?php the_permalink(); ?>" aria-label="<?php echo esc_attr(get_the_title()); ?>">
+    <?php if ($thumb_url): ?>
+      <img class="profile-card__img" src="<?php echo esc_url($thumb_url); ?>" alt="<?php echo esc_attr(get_the_title()); ?>" loading="lazy">
+    <?php else: ?>
+      <div class="profile-card__img profile-card__img--placeholder"></div>
+    <?php endif; ?>
+
+    <?php if ($price): ?>
+      <span class="profile-card__price"><?php echo esc_html("от " . number_format((int)preg_replace("/[^0-9]/","",$price),0,"."," ") . "₽"); ?></span>
+    <?php endif; ?>
+
+    <button type="button" class="profile-card__fav js-fav-toggle <?php echo $fav_active ? "is-active" : ""; ?>" data-profile="<?php echo (int)$profile_id; ?>" data-nonce="<?php echo esc_attr($fav_nonce); ?>" aria-label="Избранное"><?php echo $fav_active ? "♥" : "♡"; ?></button>
+  </a>
+
+  <div class="profile-card__body">
+    <h3 class="profile-card__title">
+      <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+    </h3>
+
+    <div class="profile-card__meta">
+      <?php if ($city): ?><span class="profile-card__city"><?php echo esc_html($city); ?></span><?php endif; ?>
+      <?php if ($is_verified): ?><span class="profile-card__badge">Verified</span><?php endif; ?>
+    </div>
+
+    <div class="profile-card__actions" aria-hidden="true">
+      <span class="profile-card__icon">💬 1</span>
+      <span class="profile-card__icon">👁 3</span>
+      <span class="profile-card__icon">★ 5</span>
+    </div>
+  </div>
+</article>
+

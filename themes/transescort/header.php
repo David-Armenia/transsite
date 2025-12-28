@@ -1,0 +1,21 @@
+<!doctype html>
+<html <?php language_attributes(); ?>>
+<head>
+  <meta charset="<?php bloginfo('charset'); ?>">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <?php wp_head(); ?>
+</head>
+
+<body <?php body_class(); ?>>
+<?php
+  $fav_count = 0;
+  if (is_user_logged_in()) {
+    $fav_ids = get_user_meta(get_current_user_id(), "_favorite_profile_ids", true);
+    if (is_array($fav_ids)) $fav_count = count(array_filter(array_map("intval", $fav_ids)));
+  }
+?>
+
+<?php wp_body_open(); ?>
+
+<header class="topbar">  <div class="container topbar__inner">    <a class="topbar__logo" href="<?php echo esc_url(home_url('/')); ?>">TransEscort</a>    <form class="topbar__search" action="<?php echo esc_url(home_url('/')); ?>" method="get" role="search">      <span class="topbar__search-ico" aria-hidden="true">🔍</span>      <input class="topbar__search-input" type="search" name="s" placeholder="Москва, Россия" value="<?php echo esc_attr(get_search_query()); ?>">      <input type="hidden" name="post_type" value="profile">    </form>    <div class="topbar__actions">      <a class="topbar__icon" href="#" aria-label="Favorites">♡</a>      <a class="topbar__icon" href="#" aria-label="Info">ⓘ</a>      <?php if (is_user_logged_in()): ?>        <a class="btn btn-primary topbar__btn" href="<?php echo esc_url(wp_logout_url(home_url('/'))); ?>">Logout</a>      <?php else: ?>        <a class="btn topbar__btn" href="<?php echo esc_url(home_url('/login/')); ?>">Вход</a>        <a class="btn btn-primary topbar__btn" href="<?php echo esc_url(home_url('/account/')); ?>">Регистрация</a>      <?php endif; ?>    </div>  </div></header>
+

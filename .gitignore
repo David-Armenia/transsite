@@ -1,0 +1,20 @@
+# uploads and cache
+uploads/
+cache/
+upgrade/
+backups/
+ai1wm-backups/
+wflogs/
+debug.log
+
+# OS/IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# deps
+node_modules/
+vendor/
+*.log
+

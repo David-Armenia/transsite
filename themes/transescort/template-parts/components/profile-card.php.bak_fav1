@@ -1,0 +1,44 @@
+<?php
+$profile_id = get_the_ID();
+
+$price    = get_post_meta($profile_id, '_profile_price', true);
+$city     = get_post_meta($profile_id, '_profile_city', true);
+$verified = get_post_meta($profile_id, '_profile_verified', true);
+$is_verified = ($verified === '1');
+
+$thumb_url = transescort_get_profile_image_url($profile_id, 'large');
+?>
+
+<article class="profile-card">
+  <a class="profile-card__media" href="<?php the_permalink(); ?>" aria-label="<?php echo esc_attr(get_the_title()); ?>">
+    <?php if ($thumb_url): ?>
+      <img class="profile-card__img" src="<?php echo esc_url($thumb_url); ?>" alt="<?php echo esc_attr(get_the_title()); ?>" loading="lazy">
+    <?php else: ?>
+      <div class="profile-card__img profile-card__img--placeholder"></div>
+    <?php endif; ?>
+
+    <?php if ($price): ?>
+      <span class="profile-card__price"><?php echo esc_html("от " . number_format((int)preg_replace("/[^0-9]/","",$price),0,"."," ") . "₽"); ?></span>
+    <?php endif; ?>
+
+    <span class="profile-card__fav" aria-hidden="true">♡</span>
+  </a>
+
+  <div class="profile-card__body">
+    <h3 class="profile-card__title">
+      <a href="<?php the_permalink(); ?>"><?php the_title(); ?></a>
+    </h3>
+
+    <div class="profile-card__meta">
+      <?php if ($city): ?><span class="profile-card__city"><?php echo esc_html($city); ?></span><?php endif; ?>
+      <?php if ($is_verified): ?><span class="profile-card__badge">Verified</span><?php endif; ?>
+    </div>
+
+    <div class="profile-card__actions" aria-hidden="true">
+      <span class="profile-card__icon">💬 1</span>
+      <span class="profile-card__icon">👁 3</span>
+      <span class="profile-card__icon">★ 5</span>
+    </div>
+  </div>
+</article>
+

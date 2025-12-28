@@ -1,0 +1,283 @@
+<?php
+get_header();
+
+$profile_id = get_the_ID();
+
+// Meta
+$price    = get_post_meta($profile_id, '_profile_price', true);
+$city     = get_post_meta($profile_id, '_profile_city', true);
+$verified = (get_post_meta($profile_id, '_profile_verified', true) === '1');
+
+// Owner / permissions
+$is_owner = false;
+if (is_user_logged_in()) {
+  $user_id  = get_current_user_id();
+  $owner_id = (int) get_post_meta($profile_id, '_profile_user_id', true);
+
+  $linked_profile_id = (int) get_user_meta($user_id, '_linked_profile_id', true);
+  $is_owner = ($user_id === $owner_id) || ($linked_profile_id === $profile_id);
+}
+
+// Gallery
+$gallery_ids = get_post_meta($profile_id, '_profile_gallery_ids', true);
+if (!is_array($gallery_ids)) $gallery_ids = [];
+$gallery_ids = array_values(array_unique(array_map('intval', $gallery_ids)));
+?>
+
+<main class="site-main">
+<section class="profile">
+  <div class="container profile-grid">
+
+    <!-- LEFT -->
+    <div class="profile-left">
+      <!-- TOP (FIGMA) -->
+      <?php
+          // берем 3 фото: главное (thumbnail) + 2 превью из галереи (без дублей)
+          $main_url = get_the_post_thumbnail_url($profile_id, "large");
+          if (!$main_url) {
+            $first_id = $gallery_ids[0] ?? 0;
+            $main_url = $first_id ? wp_get_attachment_url($first_id) : "";
+          }
+
+          $thumbs = $gallery_ids;
+          $thumb_id = (int) get_post_thumbnail_id($profile_id);
+          if ($thumb_id) {
+            $thumbs = array_values(array_diff($thumbs, [$thumb_id]));
+          }
+          $thumbs = array_slice($thumbs, 0, 2);
+
+            $thumbs = array_values(array_diff($thumbs, [(int)$thumb_id]));
+          }
+          $thumbs = array_slice($thumbs, 0, 2);
+
+      ?>
+
+        <div class="sp-top">
+          <div class="sp-left">
+            <div class="sp-hero" <?php if ($main_url): ?>style="background-image:url('<?php echo esc_url($main_url); ?>')"<?php endif; ?>>
+              <div class="sp-badges">
+                <div class="sp-badge sp-badge--rating"><span>5+</span><small>Рейтинг</small></div>
+                <?php if ($verified): ?>
+                  <div class="sp-badge sp-badge--verified"><span>100%</span><small>Проверена</small></div>
+                <?php endif; ?>
+              </div>
+              <?php if (!$main_url): ?>
+                <div class="profile-gallery-placeholder"></div>
+              <?php endif; ?>
+            </div>
+          </div>
+
+          <div class="sp-right">
+            <div class="sp-side">
+              <?php $thumbs = array_slice($gallery_ids, 1, 2); ?>
+              <?php foreach ($thumbs as $tid): ?>
+                <?php $turl = wp_get_attachment_url((int)$tid); if (!$turl) continue; ?>
+                <div class="sp-side-item" style="background-image:url('<?php echo esc_url($turl); ?>')"></div>
+              <?php endforeach; ?>
+            </div>
+          </div>
+        </div>
+
+
+
+      <!-- Videos -->
+      <?php
+      $videos_q = new WP_Query([
+        'post_type'      => 'video',
+        'post_status'    => 'publish',
+        'posts_per_page' => 6,
+        'orderby'        => 'date',
+        'order'          => 'DESC',
+        'meta_query'     => [
+          [
+            'key'     => '_video_profile_id',
+            'value'   => $profile_id,
+            'compare' => '='
+          ]
+        ],
+      ]);
+      ?>
+
+      <?php if ($videos_q->have_posts()): ?>
+        <div class="profile-card">
+          <div class="profile-block-head">
+            <h2 class="profile-block-title">Видео</h2>
+          </div>
+
+          <div class="profile-videos">
+            <?php while ($videos_q->have_posts()): $videos_q->the_post(); ?>
+              <?php
+                $video_id  = get_the_ID();
+                $att_id    = (int) get_post_meta($video_id, '_video_attachment_id', true);
+                $url       = $att_id ? wp_get_attachment_url($att_id) : '';
+                $dur       = get_post_meta($video_id, '_video_duration', true);
+                $cover_id  = (int) get_post_meta($video_id, '_video_cover_id', true);
+                $cover_url = $cover_id ? wp_get_attachment_image_url($cover_id, 'large') : '';
+                if (!$url) continue;
+              ?>
+
+              <article class="pv-card">
+                <button
+                  class="pv-media video-open"
+                  type="button"
+                  data-video="<?php echo esc_url($url); ?>"
+                  <?php if ($cover_url): ?>style="background-image:url('<?php echo esc_url($cover_url); ?>')"<?php endif; ?>
+                >
+                  <span class="pv-play">▶</span>
+                  <?php if (!empty($dur)): ?>
+                    <span class="pv-duration"><?php echo esc_html($dur); ?></span>
+                  <?php endif; ?>
+                </button>
+
+                <div class="pv-body">
+                  <div class="pv-title"><?php the_title(); ?></div>
+                  <div class="pv-meta"><?php echo esc_html(get_the_date('d.m.Y')); ?></div>
+                </div>
+              </article>
+            <?php endwhile; wp_reset_postdata(); ?>
+          </div>
+        </div>
+      <?php endif; ?>
+
+
+    </div><!-- /.profile-left -->
+
+
+    <!-- RIGHT -->
+    <aside class="profile-right">
+        <div class="profile-summary">
+          <div class="sp-head">
+            <h1 class="profile-name">
+              <?php the_title(); ?>
+              <?php if ($verified): ?>
+                <span class="profile-badge">100% Проверена</span>
+              <?php endif; ?>
+            </h1>
+            <?php if (!empty($city)): ?>
+              <div class="profile-city"><?php echo esc_html($city); ?></div>
+            <?php endif; ?>
+          </div>
+
+          <div class="sp-contacts">
+            <a class="sp-icon-btn" href="#" aria-label="WhatsApp">WA</a>
+            <a class="sp-icon-btn" href="#" aria-label="Telegram">TG</a>
+            <a class="sp-icon-btn" href="#" aria-label="Phone">☎</a>
+          </div>
+
+          <?php if (!empty($price)): ?>
+            <div class="profile-price"><?php echo esc_html($price); ?></div>
+          <?php endif; ?>
+
+          <div class="sp-sizes">
+            <button type="button" class="sp-chip">XS</button>
+            <button type="button" class="sp-chip">S</button>
+            <button type="button" class="sp-chip">M</button>
+            <button type="button" class="sp-chip">L</button>
+            <button type="button" class="sp-chip">XL</button>
+            <button type="button" class="sp-chip">2XL</button>
+          </div>
+
+          <div class="sp-services">
+            <div class="sp-service">
+              <div class="sp-service-title">Выезд</div>
+              <div class="sp-service-meta">1 час — 25 000₽</div>
+            </div>
+            <div class="sp-service">
+              <div class="sp-service-title">Апартаменты</div>
+              <div class="sp-service-meta">1 час — 15 000₽</div>
+            </div>
+          </div>
+
+          <?php
+            $fav_active = false;
+            if (is_user_logged_in()) {
+              $fav_ids = get_user_meta(get_current_user_id(), "_favorite_profile_ids", true);
+              if (is_array($fav_ids)) {
+                $fav_active = in_array((int)$profile_id, array_map("intval", $fav_ids), true);
+              }
+            }
+            $fav_nonce = wp_create_nonce("te_fav_profile");
+          ?>
+
+          <div class="sp-actions">
+            <button type="button" class="btn btn-secondary sp-like js-fav-toggle <?php echo $fav_active ? "is-active" : ""; ?>" data-profile="<?php echo (int)$profile_id; ?>" data-nonce="<?php echo esc_attr($fav_nonce); ?>"><?php echo $fav_active ? "♥ В избранном" : "♡ Добавить в избранное"; ?></button>
+            <button type="button" class="btn btn-primary sp-msg">Написать</button>
+          </div>
+
+          <?php if ($is_owner): ?>
+            <a class="btn btn-primary" href="<?php echo esc_url(home_url("/personal-profile/")); ?>">Редактировать профиль</a>
+          <?php endif; ?>
+        </div>
+    </aside>
+      <!-- Tabs -->
+
+  </div>
+</section>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var root = document.getElementById("profileTabs");
+  if (!root) return;
+
+  var buttons = root.querySelectorAll(".tab-btn");
+  var panes   = root.querySelectorAll(".tab-pane");
+  if (!buttons.length || !panes.length) return;
+
+  function activate(key){
+    buttons.forEach(function(b){ b.classList.toggle("active", b.dataset.tab === key); });
+    panes.forEach(function(p){ p.classList.toggle("active", p.id === ("tab-" + key)); });
+  }
+
+  buttons.forEach(function(btn){
+    btn.addEventListener("click", function(){
+      activate(btn.dataset.tab);
+    });
+  });
+});
+</script>
+
+<script>
+document.addEventListener("click", async function(e){
+  const btn = e.target.closest(".js-fav-toggle");
+  if (!btn) return;
+  e.preventDefault();
+
+  const profileId = btn.getAttribute("data-profile");
+  const nonce = btn.getAttribute("data-nonce");
+  if (!profileId || !nonce) return;
+
+  btn.disabled = true;
+  try {
+    const body = new URLSearchParams();
+    body.append("action", "te_toggle_favorite_profile");
+    body.append("profile_id", profileId);
+    body.append("nonce", nonce);
+
+    const ajaxurl = (window.TRANS && TRANS.ajaxurl) ? TRANS.ajaxurl : "/wp-admin/admin-ajax.php";
+    const res = await fetch(ajaxurl, {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
+      body: body.toString()
+    });
+
+    const json = await res.json();
+    if (!json || !json.success) {
+      if (res.status === 401) alert("Нужно войти, чтобы добавлять в избранное.");
+      return;
+    }
+
+    const active = !!json.data.active;
+    btn.classList.toggle("is-active", active);
+    btn.textContent = active ? "♥ В избранном" : "♡ Добавить в избранное";
+  } catch (err) {
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+  }
+});
+</script>
+
+</main>
+
+<?php get_footer(); ?>
+

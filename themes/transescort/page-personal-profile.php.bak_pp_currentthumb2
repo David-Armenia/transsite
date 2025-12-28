@@ -1,0 +1,450 @@
+<?php
+$current_user = wp_get_current_user();
+$phone = get_user_meta(get_current_user_id(), 'phone', true); if (!is_string($phone)) { $phone = ''; }
+$email = ($current_user instanceof WP_User) ? $current_user->user_email : '';
+$main_photo_url = '';
+
+
+
+
+/**
+ * Template Name: Personal Profile
+ */
+
+get_header();
+
+if (!is_user_logged_in()) {
+  wp_safe_redirect(home_url('/login/'));
+  exit;
+}
+
+$user_id = get_current_user_id();
+$profile_id = (int) transescort_get_linked_profile_id($user_id);
+/* main photo url (safe) */
+if ($profile_id) {
+  $thumb_id = get_post_thumbnail_id($profile_id);
+  if ($thumb_id) {
+    $tmp = wp_get_attachment_image_url($thumb_id, 'large');
+    if (is_string($tmp) && $tmp !== '') { $main_photo_url = $tmp; }
+  }
+}
+if (!is_string($main_photo_url) || $main_photo_url === '') {
+  $main_photo_url = get_stylesheet_directory_uri() . '/assets/img/placeholder.jpg';
+}
+
+
+if (!$profile_id) : ?>
+  <main class="site-main">
+    <section class="container pp">
+
+<?php if (isset($_GET["created"]) && $_GET["created"] === "1") : ?>
+  <div class="pp-alert pp-alert--success" style="margin:10px 0;">
+    Профиль создан ✅
+  </div>
+<?php elseif (isset($_GET["created"]) && $_GET["created"] === "0") : ?>
+  <div class="pp-alert pp-alert--success" style="margin:10px 0;">
+    Профиль уже был создан ранее ✅
+  </div>
+<?php endif; ?>
+
+      <h1 class="page-title">Personal profile</h1>
+      <p class="pp-muted">No linked profile found for your account.</p>
+      <p style="margin-top:16px;">
+        <a class="btn btn-primary" href="<?php echo esc_url(home_url("/personal-profile/?create=1")); ?>">Create my profile</a>
+      </p>
+    </section>
+  </main>
+<?php
+  get_footer();
+  exit;
+endif;
+?>
+
+<?php
+// Extra safety: owner/admin only
+$can_view = current_user_can('administrator') || transescort_user_owns_profile($user_id, $profile_id);
+if (!$can_view) {
+  wp_die('Access denied', 'Access denied', ['response' => 403]);
+}
+
+// Profile meta
+$price    = get_post_meta($profile_id, '_profile_price', true);
+$city     = get_post_meta($profile_id, '_profile_city', true);
+$verified = get_post_meta($profile_id, '_profile_verified', true);
+$is_verified = ($verified === '1');
+
+$profile_url = get_permalink($profile_id);
+$edit_url    = get_edit_post_link($profile_id, '');
+
+// Gallery meta (array of attachment IDs)
+$gallery_ids = get_post_meta($profile_id, '_profile_gallery_ids', true);
+if (!is_array($gallery_ids)) $gallery_ids = [];
+$gallery_ids = array_values(array_unique(array_map('intval', $gallery_ids)));
+
+// Upload status from redirect
+$upload_status = isset($_GET['upload']) ? sanitize_text_field($_GET['upload']) : '';
+$deleted = isset($_GET['deleted']) ? sanitize_text_field($_GET['deleted']) : '';
+?>
+
+  <section class="container pp">
+
+<?php if (isset($_GET["created"]) && $_GET["created"] === "1") : ?>
+  <div class="pp-alert pp-alert--success" style="margin:10px 0;">
+    Профиль создан ✅
+  </div>
+<?php elseif (isset($_GET["created"]) && $_GET["created"] === "0") : ?>
+  <div class="pp-alert pp-alert--success" style="margin:10px 0;">
+    Профиль уже был создан ранее ✅
+  </div>
+<?php endif; ?>
+
+
+
+<section class="pp-head">
+  <div class="pp-head__grid">
+
+    <aside class="pp-side" aria-label="Menu">
+      <a class="pp-side__btn" href="#" aria-label="Profile"><span>👤</span></a>
+      <a class="pp-side__btn" href="#" aria-label="Favorites"><span>♡</span></a>
+      <a class="pp-side__btn" href="#" aria-label="Open public"><span>↗</span></a>
+      <a class="pp-side__btn" href="#" aria-label="Settings"><span>⚙</span></a>
+    </aside>
+
+    <div class="pp-photo">
+      <div class="pp-photo__media"><img src="<?php echo esc_url((string) $main_photo_url); ?>" alt=""></div>
+      <button class="pp-photo__cta" type="button">Изменить фото</button>
+
+<!-- Main photo picker -->
+<div class="pp-modal" id="ppMainPhotoModal" aria-hidden="true">
+  <div class="pp-modal__backdrop" data-pp-close></div>
+  <div class="pp-modal__panel" role="dialog" aria-modal="true">
+    <div class="pp-modal__head">
+      <div class="pp-modal__title">Выберите главное фото</div>
+      <button class="pp-modal__close" type="button" data-pp-close>✕</button>
+    </div>
+
+    <form class="pp-mainphoto-form" method="post" action="<?php echo esc_url(admin_url("admin-post.php")); ?>">
+      <?php wp_nonce_field("transescort_set_main_photo", "transescort_set_main_photo_nonce"); ?>
+      <input type="hidden" name="action" value="transescort_set_main_photo">
+      <input type="hidden" name="profile_id" value="<?php echo (int)$profile_id; ?>">
+      <input type="hidden" name="att_id" id="ppMainPhotoAttId" value="">
+
+        <?php $current_thumb_id = (int) get_post_thumbnail_id($profile_id); ?>
+
+      <div class="pp-modal__grid">
+        <?php foreach ($gallery_ids as $att_id): ?>
+          <?php
+            $att_id = (int)$att_id; if (!$att_id) continue;
+            $t = wp_get_attachment_image_url($att_id, "medium");
+            $f = wp_get_attachment_image_url($att_id, "full");
+            $src = $t ?: $f; if (!$src) continue;
+          ?>
+          <button type="button" class="pp-pick" data-att="<?php echo (int)$att_id; ?>" style="background-image:url('<?php echo esc_url($src); ?>');"></button>
+        <?php endforeach; ?>
+      </div>
+
+      <?php if (empty($gallery_ids)): ?>
+        <div class="pp-muted" style="margin-top:10px;">Сначала загрузите фото в Gallery.</div>
+      <?php endif; ?>
+    </form>
+  </div>
+</div>
+
+<script>
+(function(){
+  var btn = document.querySelector(".pp-photo__cta");
+  var modal = document.getElementById("ppMainPhotoModal");
+  if(!btn || !modal) return;
+
+  function openModal(){ modal.setAttribute("aria-hidden","false"); modal.classList.add("is-open"); }
+  function closeModal(){ modal.setAttribute("aria-hidden","true"); modal.classList.remove("is-open"); }
+
+  btn.addEventListener("click", function(e){ e.preventDefault(); openModal(); });
+  modal.addEventListener("click", function(e){
+    if(e.target && (e.target.hasAttribute("data-pp-close") || e.target.closest("[data-pp-close]"))) closeModal();
+  });
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape") closeModal(); });
+
+  var input = document.getElementById("ppMainPhotoAttId");
+  var form = modal.querySelector("form");
+  modal.querySelectorAll(".pp-pick").forEach(function(b){
+    b.addEventListener("click", function(){
+      input.value = b.getAttribute("data-att");
+      form.submit();
+    });
+  });
+})();
+</script>
+
+    </div>
+
+    <div class="pp-card pp-card--info">
+      <h2 class="pp-card__title">Основная информация</h2>
+      <div class="pp-fields">
+        <div class="pp-field">
+          <div class="pp-label">Имя</div>
+          <div class="pp-value"><?php echo esc_html($current_user instanceof WP_User ? $current_user->display_name : ""); ?></div>
+        </div>
+        <div class="pp-field">
+          <div class="pp-label">Номер телефона</div>
+          <div class="pp-value"><?php echo esc_html($phone ?: "—"); ?></div>
+        </div>
+        <div class="pp-field">
+          <div class="pp-label">Email</div>
+          <div class="pp-value"><?php echo esc_html($email ?: "—"); ?></div>
+        </div>
+      </div>
+      <a class="btn btn-dark pp-btn-wide" href="#" type="button">Редактировать</a>
+    </div>
+
+    <div class="pp-card pp-card--plan">
+      <h2 class="pp-card__title">Тарифный план:</h2>
+      <div class="pp-plan__price">
+        <span class="pp-plan__num">$99</span>
+        <span class="pp-plan__per">/year</span>
+      </div>
+      <ul class="pp-plan__list">
+        <li>Premium Component Library</li>
+        <li>Exclusive Freebies</li>
+        <li>Monthly Free Exclusive</li>
+        <li>Customer Support</li>
+      </ul>
+      <a class="btn btn-dark pp-btn-wide" href="#" type="button">Изменить</a>
+    </div>
+
+  </div>
+</section>
+
+
+<section class="pp-active">
+  <h2 class="pp-active__title">Активные анкеты</h2>
+
+  <div class="pp-active__grid">
+    <?php
+      $active_ids = [];
+      if (!empty($profile_id)) { $active_ids[] = (int)$profile_id; }
+    ?>
+
+    <?php foreach ($active_ids as $pid): ?>
+      <?php
+        $pid = (int) $pid;
+        if (!$pid) continue;
+        $p_title = get_the_title($pid);
+        $p_price = get_post_meta($pid, "_profile_price", true);
+        $p_thumb = get_the_post_thumbnail_url($pid, "large");
+        if (!$p_thumb) { $p_thumb = get_stylesheet_directory_uri() . "/assets/img/placeholder.jpg"; }
+      ?>
+
+      <article class="pp-active-card">
+        <a class="pp-active-card__link" href="<?php echo esc_url(get_permalink($pid)); ?>"></a>
+        <div class="pp-active-card__media" style="background-image:url('<?php echo esc_url($p_thumb); ?>');">
+          <?php if (!empty($p_price)): ?>
+            <div class="pp-active-card__price">от <?php echo esc_html($p_price); ?></div>
+          <?php endif; ?>
+          <button class="pp-active-card__fav" type="button" aria-label="Favorite">♡</button>
+        </div>
+        <div class="pp-active-card__body">
+  <div class="pp-active-stats">
+    <span class="pp-stat"><i>❤️</i> 124</span>
+    <span class="pp-stat"><i>👁</i> 1.2k</span>
+    <span class="pp-stat"><i>⭐</i> 4.8</span>
+  </div>
+
+          <div class="pp-active-card__name"><?php echo esc_html($p_title ?: "—"); ?></div>
+        </div>
+      </article>
+    <?php endforeach; ?>
+
+    <a class="pp-active-add" href="<?php echo esc_url(home_url("/personal-profile/?create=1")); ?>">
+      <span class="pp-active-add__plus">+</span>
+      <span class="pp-active-add__text">Добавить анкету</span>
+    </a>
+  </div>
+</section>
+
+/
+<div class="pp-grid">
+      <!-- LEFT -->
+      <div class="pp-left">
+
+        <!-- Gallery -->
+        <section class="pp-card">
+          <h2 class="pp-section-title">Gallery</h2>
+
+          <?php if ($upload_status === 'ok'): ?>
+            <div class="pp-alert pp-alert--success" style="margin:10px 0;">
+              Photos uploaded successfully.
+            </div>
+          <?php elseif ($upload_status === 'no_files'): ?>
+            <div class="pp-alert pp-alert--error" style="margin:10px 0;">
+              No files selected.
+            </div>
+          <?php endif; ?>
+
+          <?php if ($deleted === '1'): ?>
+            <div class="pp-alert pp-alert--success" style="margin:10px 0;">
+              Photo deleted.
+            </div>
+          <?php endif; ?>
+
+          <!-- Upload form -->
+          <form method="post" enctype="multipart/form-data" class="pp-upload-form">
+            <?php wp_nonce_field('transescort_profile_upload'); ?>
+            <input type="hidden" name="action" value="transescort_upload_photos">
+
+            <label class="pp-upload-select">
+              <input type="file" name="photos[]" multiple accept="image/*" hidden>
+              Upload photos
+            </label>
+
+            <button type="submit" class="pp-upload-btn">
+              Upload photos
+            </button>
+          </form>
+
+          <?php if (!empty($gallery_ids)): ?>
+            <div class="pp-gallery">
+              <?php foreach ($gallery_ids as $att_id): ?>
+                <?php
+                  $att_id = (int) $att_id;
+                  if (!$att_id) continue;
+
+                  // Fallback: if medium not generated, use full
+                  $thumb = wp_get_attachment_image_url($att_id, 'medium');
+                  $full  = wp_get_attachment_image_url($att_id, 'full');
+
+                  $url = $thumb ?: $full;
+                  if (!$url) continue;
+
+                  $href = $full ?: $url;
+                ?>
+
+                <div class="pp-gallery-item" style="background-image:url('<?php echo esc_url($url); ?>');">
+                  <!-- open photo -->
+                  <a class="pp-gallery-open" href="<?php echo esc_url($href); ?>" target="_blank" rel="noopener"></a>
+
+                  <!-- delete button (on hover) -->
+                  <form method="post" class="pp-photo-del-form" onsubmit="return confirm('Delete this photo?');">
+                    <?php wp_nonce_field('delete_profile_photo'); ?>
+                    <input type="hidden" name="action" value="delete_profile_photo">
+                    <input type="hidden" name="att_id" value="<?php echo (int) $att_id; ?>">
+                    <button type="submit" class="pp-photo-del-btn">Delete</button>
+                  </form>
+                </div>
+
+              <?php endforeach; ?>
+            </div>
+          <?php else: ?>
+            <p class="pp-muted">No photos yet. Upload your first photos above.</p>
+          <?php endif; ?>
+
+          <p class="pp-hint" style="margin-top:12px;">
+            Next: we will style gallery + lightbox according to Figma.
+          </p>
+        </section>
+
+        <!-- Activity / tariffs placeholder -->
+        <section class="pp-card pp-card--mt">
+          <h2 class="pp-section-title">Tariffs & Activity</h2>
+          <p class="pp-muted">Placeholder. Next step: connect pricing blocks and activity UI from Figma 8/16.</p>
+        </section>
+
+      </div>
+
+      <!-- RIGHT -->
+      <aside class="pp-right">
+
+        <!-- Quick info -->
+        <section class="pp-card">
+          <h2 class="pp-section-title">Info</h2>
+
+          <div class="pp-info">
+            <div class="pp-info-row"><strong>City:</strong> <?php echo esc_html($city ?: '—'); ?></div>
+            <div class="pp-info-row"><strong>Price:</strong> <?php echo esc_html($price ?: '—'); ?></div>
+            <div class="pp-info-row"><strong>Status:</strong> <?php echo $is_verified ? 'Verified' : 'Not verified'; ?></div>
+          </div>
+
+
+<?php if (isset($_GET["saved"]) && $_GET["saved"] === "city"): ?>
+  <div class="pp-alert pp-alert--success" style="margin:10px 0;">
+    Город сохранён ✅
+  </div>
+<?php endif; ?>
+
+<form method="post" class="pp-card pp-card--mt" style="padding:0;border:0;background:transparent;box-shadow:none;">
+  <?php wp_nonce_field("transescort_save_profile_city", "transescort_save_profile_city_nonce"); ?>
+  <input type="hidden" name="action" value="transescort_save_profile_city">
+
+  <div class="pp-info" style="margin-top:10px;">
+    <div class="pp-info-row"><strong>Change city:</strong></div>
+
+    <select name="profile_city" style="width:100%; margin-top:8px;">
+      <?php foreach (transescort_city_list() as $val => $label): ?>
+        <option value="<?php echo esc_attr($val); ?>" <?php selected((string)$city, (string)$val); ?>>
+          <?php echo esc_html($label); ?>
+        </option>
+      <?php endforeach; ?>
+    </select>
+
+    <button type="submit" class="btn btn-primary" style="margin-top:12px;">Сохранить</button>
+  </div>
+</form>
+
+
+          </section>
+
+          <!-- Requests (last 5) -->
+        <section class="pp-card pp-card--mt">
+          <h2 class="pp-section-title">Latest Requests</h2>
+
+          <?php
+            $requests = transescort_get_profile_requests($profile_id, 5);
+            if (empty($requests)):
+          ?>
+            <p class="pp-muted">No requests yet.</p>
+          <?php else: ?>
+            <div class="pp-requests-list">
+              <?php foreach ($requests as $r): ?>
+                <?php
+                  $status   = transescort_get_request_status($r->ID);
+                  $name     = get_post_meta($r->ID, '_request_name', true);
+                  $contact  = get_post_meta($r->ID, '_request_contact', true);
+                  $dt       = get_post_meta($r->ID, '_request_datetime', true);
+                  $label    = transescort_request_status_label($status);
+                ?>
+
+                <div class="pp-request-item">
+                  <div class="pp-request-top">
+                    <div class="pp-request-person">
+                      <?php echo esc_html($name ?: '—'); ?>
+                      <span class="pp-request-contact">— <?php echo esc_html($contact ?: ''); ?></span>
+                    </div>
+
+                    <div class="request-status status-<?php echo esc_attr($status); ?>">
+                      <?php echo esc_html($label); ?>
+                    </div>
+                  </div>
+
+                  <?php if ($dt): ?>
+                    <div class="pp-request-dt"><?php echo esc_html($dt); ?></div>
+                  <?php endif; ?>
+                </div>
+
+              <?php endforeach; ?>
+            </div>
+
+            <div class="pp-actions-row">
+              <a class="btn btn-outline" href="<?php echo esc_url(home_url('/account/')); ?>">
+                View all in Account
+              </a>
+            </div>
+          <?php endif; ?>
+        </section>
+
+      </aside>
+    </div>
+
+  </section>
+
+<?php get_footer(); ?>
+
