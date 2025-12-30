@@ -46,6 +46,10 @@ get_header();
         <!-- LOGIN FORM -->
         <form class="auth-form-inner js-login-form" method="post">
           <?php wp_nonce_field('transescort_login', 'login_nonce'); ?>
+          <div class="auth-remember">
+            <label><input type="checkbox" name="remember" value="1"> Запомнить меня</label>
+          </div>
+
 
           <div class="field">
             <label>Email</label>

@@ -1,7 +1,9 @@
 <?php
-/**
- * Theme setup
- */
+$theme_inc = get_template_directory() . "/inc";
+require_once $theme_inc . "/enqueue.php";
+require_once $theme_inc . "/ajax.php";
+
+
 add_action('after_setup_theme', function () {
     add_theme_support('title-tag');
     add_theme_support('post-thumbnails');
@@ -21,82 +23,29 @@ add_action('after_setup_theme', function () {
 
 }, 20);
 
-/**
- * Hide admin bar for non-admins
- */
+
 add_action('init', function () {
     if (is_user_logged_in() && !current_user_can('administrator')) {
         show_admin_bar(false);
     }
 });
 
-/**
- * Enqueue styles & scripts
- */
-/**
- * Enqueue styles & scripts
- */
-add_action('wp_enqueue_scripts', function () {
-
-  // Fonts (Figma)
-  wp_enqueue_style(
-    'transescort-fonts',
-    'https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap',
-    [],
-    null
-  );
-
-  // Main styles
-  wp_enqueue_style(
-    'transescort-main',
-    get_template_directory_uri() . '/assets/css/main.css',
-    [],
-    '1.0'
-  );
-
-  // Main scripts
-  wp_enqueue_script(
-    'transescort-main',
-    get_template_directory_uri() . '/assets/js/main.js',
-    [],
-    '1.0',
-    true
-  );
 
 
 
-    
 
-    wp_localize_script('transescort-main', 'TRANS', [
-        'ajax_url' => admin_url('admin-ajax.php'),
-        'nonce'    => wp_create_nonce('transescort_request'),
-    ]);
-// AUTH (Login / Register)
-    wp_enqueue_script(
-        'transescort-auth',
-        get_template_directory_uri() . '/assets/js/auth.js',
-        [],
-        time(), // no cache
-        true
-    );
-
-    wp_localize_script('transescort-auth', 'transescortAuth', [
-        'ajaxurl' => admin_url('admin-ajax.php'),
-    ]);
-});
-
-/**
- * ============================================================
- * CPT: Profile
- * ============================================================
- */
 add_action('init', function () {
     register_post_type('profile', [
         'labels' => [
             'name'          => 'Profiles',
             'singular_name' => 'Profile',
+
         ],
-        'public'        => true,
+        'public'             => true,
+        'publicly_queryable' => true,
+        'exclude_from_search'=> false,
+        'query_var'          => true,
+
         'has_archive'   => true,
         'rewrite'       => ['slug' => 'profiles'],
         'menu_icon'     => 'dashicons-id',
@@ -105,11 +54,7 @@ add_action('init', function () {
     ]);
 });
 
-/**
- * ============================================================
- * Helpers: Profile ownership + link
- * ============================================================
- */
+
 function transescort_get_linked_profile_id($user_id = 0) {
     $user_id = $user_id ? (int) $user_id : get_current_user_id();
     return (int) get_user_meta($user_id, '_linked_profile_id', true);
@@ -136,11 +81,7 @@ if (!function_exists('transescort_user_owns_profile')) {
     }
 }
 
-/**
- * ============================================================
- * Profile meta boxes: Profile details + Linked user
- * ============================================================
- */
+
 add_action('add_meta_boxes_profile', function () {
 	    // Profile gallery
     add_meta_box(
@@ -171,6 +112,9 @@ add_action('add_meta_boxes_profile', function () {
         'side',
         'default'
     );
+
+});
+
 function te_profile_gallery_metabox($post){
   wp_nonce_field('te_save_profile_gallery', 'te_profile_gallery_nonce');
 
@@ -191,49 +135,67 @@ function te_profile_gallery_metabox($post){
 
   echo '<button type="button" class="button" id="te-profile-gallery-add">Add photos</button> ';
   echo '<button type="button" class="button" id="te-profile-gallery-clear">Clear</button>';
-  ?>
-
-  <script>
-  (function($){
-    let frame;
-
-    $('#te-profile-gallery-add').on('click', function(e){
-      e.preventDefault();
-
-      frame = wp.media({
-        title: 'Select gallery images',
-        button: { text: 'Use selected' },
-        library: { type: 'image' },
-        multiple: true
-      });
-
-      frame.on('select', function(){
-        const selection = frame.state().get('selection').toJSON();
-        const ids = selection.map(i => i.id);
-        $('#te_profile_gallery_ids').val(ids.join(','));
-
-        const preview = $('#te-profile-gallery-preview');
-        preview.empty();
-        selection.forEach(i => {
-          const url = (i.sizes && i.sizes.thumbnail) ? i.sizes.thumbnail.url : i.url;
-          preview.append('<img src="'+url+'" style="width:100%;border-radius:10px;">');
-        });
-      });
-
-      frame.open();
-    });
-
-    $('#te-profile-gallery-clear').on('click', function(e){
-      e.preventDefault();
-      $('#te_profile_gallery_ids').val('');
-      $('#te-profile-gallery-preview').empty();
-    });
-  })(jQuery);
-  </script>
-  <?php
 }
 
+
+add_action("admin_menu", function () {
+  add_options_page(
+    "Cities",
+    "Cities",
+    "manage_options",
+    "transescort-cities",
+    "transescort_cities_settings_page"
+  );
 });
+
+
+function transescort_cities_settings_page() {
+    if (!current_user_can("manage_options")) return;
+
+    $saved = isset($_GET["saved"]) ? (string) $_GET["saved"] : "";
+    $value = (string) get_option("transescort_city_list", "Москва
+Санкт-Петербург
+Ереван
+Гюмри
+Ванадзор");
+    ?>
+    <div class="wrap">
+      <h1>Cities</h1>
+
+      <?php if ($saved === "1"): ?>
+        <div class="notice notice-success is-dismissible"><p>Saved.</p></div>
+      <?php endif; ?>
+
+      <form method="post" action="<?php echo esc_url(admin_url("admin-post.php")); ?>">
+        <?php wp_nonce_field("transescort_save_cities", "transescort_save_cities_nonce"); ?>
+        <input type="hidden" name="action" value="transescort_save_cities">
+
+        <p>One city per line. Empty lines ignored.</p>
+        <textarea name="cities" rows="14" style="width:700px;max-width:100%;"><?php echo esc_textarea($value); ?></textarea>
+
+        <p><button class="button button-primary" type="submit">Save</button></p>
+      </form>
+    </div>
+    <?php
+}
+
+
+add_action("admin_post_transescort_save_cities", function () {
+    if (!current_user_can("manage_options")) wp_die("No permission");
+
+    if (empty($_POST["transescort_save_cities_nonce"]) ||
+        !wp_verify_nonce($_POST["transescort_save_cities_nonce"], "transescort_save_cities")) {
+        wp_die("Security error");
+    }
+
+    $cities = isset($_POST["cities"]) ? (string) wp_unslash($_POST["cities"]) : "";
+    $cities = str_replace(["0"], "", $cities);
+    update_option("transescort_city_list", $cities);
+
+    wp_safe_redirect(add_query_arg("saved", "1", admin_url("options-general.php?page=transescort-cities")));
+    exit;
+});
+
 
 function transescort_profile_meta_box($post) {
     wp_nonce_field('transescort_save_profile_meta', 'transescort_profile_meta_nonce');
@@ -249,7 +211,11 @@ function transescort_profile_meta_box($post) {
 
     <p>
         <label>City</label><br>
-        <input type="text" name="profile_city" value="<?php echo esc_attr($city); ?>" style="width:100%">
+        <select name="profile_city" style="width:100%">
+<?php foreach (transescort_city_list() as $val => $label): ?>
+  <option value="<?php echo esc_attr($val); ?>" <?php selected((string)$city, (string)$val); ?>><?php echo esc_html($label); ?></option>
+<?php endforeach; ?>
+</select>
     </p>
 
     <p>
@@ -298,9 +264,7 @@ function transescort_profile_user_link_metabox($post) {
     }
 }
 
-/**
- * Save meta (Profile details) + Save link profile <-> user
- */
+
 add_action('save_post_profile', function ($post_id) {
 
     // 1) Save Profile details
@@ -311,8 +275,11 @@ add_action('save_post_profile', function ($post_id) {
         if (!current_user_can('edit_post', $post_id)) return;
 
         update_post_meta($post_id, '_profile_price', sanitize_text_field($_POST['profile_price'] ?? ''));
-        update_post_meta($post_id, '_profile_city', sanitize_text_field($_POST['profile_city'] ?? ''));
-        update_post_meta($post_id, '_profile_verified', isset($_POST['profile_verified']) ? '1' : '0');
+        $__city = sanitize_text_field($_POST["profile_city"] ?? "");
+          $__cities = transescort_city_list();
+          if (!array_key_exists($__city, $__cities)) { $__city = ""; }
+          update_post_meta($post_id, '_profile_city', $__city);
+          update_post_meta($post_id, '_profile_verified', isset($_POST['profile_verified']) ? '1' : '0');
     }
 
     // 2) Save Linked user (admin only)
@@ -369,273 +336,25 @@ add_action('save_post_profile', function ($post_id) {
 
 });
 
-/**
- * ============================================================
- * AJAX LOGIN (compatible + admin redirect)
- * ============================================================
- */
-add_action('wp_ajax_transescort_login', 'transescort_ajax_login');
-add_action('wp_ajax_nopriv_transescort_login', 'transescort_ajax_login');
 
-function transescort_ajax_login() {
-
-    if (
-        empty($_POST['login_nonce']) ||
-        !wp_verify_nonce($_POST['login_nonce'], 'transescort_login')
-    ) {
-        wp_send_json_error(['message' => 'Security error.'], 403);
-        return;
-    }
-
-    $login = '';
-    if (!empty($_POST['user_login'])) {
-        $login = sanitize_text_field(wp_unslash($_POST['user_login']));
-    } elseif (!empty($_POST['user_email'])) {
-        $login = sanitize_text_field(wp_unslash($_POST['user_email']));
-    }
-
-    $password = !empty($_POST['user_password']) ? (string) wp_unslash($_POST['user_password']) : '';
-    $remember = !empty($_POST['remember_me']) && (string) $_POST['remember_me'] === '1';
-
-    if ($login === '' || $password === '') {
-        wp_send_json_error(['message' => 'Login and password required.'], 400);
-        return;
-    }
-
-    if (is_email($login)) {
-        $u = get_user_by('email', $login);
-        if ($u) {
-            $login = $u->user_login;
-        } else {
-            wp_send_json_error(['message' => 'Invalid login or password.'], 401);
-            return;
-        }
-    }
-
-    $user = wp_signon([
-        'user_login'    => $login,
-        'user_password' => $password,
-        'remember'      => $remember,
-    ], is_ssl());
-
-    if (is_wp_error($user)) {
-        wp_send_json_error(['message' => 'Invalid login or password.'], 401);
-        return;
-    }
-
-    if (user_can($user, 'manage_options')) {
-        wp_send_json_success(['redirect' => admin_url()]);
-        return;
-    }
-
-    wp_send_json_success(['redirect' => home_url('/account/')]);
-    return;
-}
-/**
- * ============================================================
- * AJAX REGISTER + EMAIL CONFIRM (soft)
- * ============================================================
- */
-add_action('wp_ajax_nopriv_transescort_register', function () {
-
-    if (!isset($_POST['register_nonce']) || !wp_verify_nonce($_POST['register_nonce'], 'transescort_register')) {
-        wp_send_json_error(['message' => 'Security error.']);
-    }
-
-    $email = sanitize_email($_POST['user_email'] ?? '');
-    $pass1 = $_POST['user_password'] ?? '';
-    $pass2 = $_POST['user_password_repeat'] ?? '';
-    $terms = isset($_POST['terms']);
-
-    if (!$email || !$pass1 || !$pass2) {
-        wp_send_json_error(['message' => 'All fields are required.']);
-    }
-
-    if (!is_email($email)) {
-        wp_send_json_error(['message' => 'Invalid email.']);
-    }
-
-    if ($pass1 !== $pass2) {
-        wp_send_json_error(['message' => 'Passwords do not match.']);
-    }
-
-    if (strlen($pass1) < 6) {
-        wp_send_json_error(['message' => 'Password too short (min 6).']);
-    }
-
-    if (!$terms) {
-        wp_send_json_error(['message' => 'You must confirm 18+ and Terms.']);
-    }
-
-    if (email_exists($email)) {
-        wp_send_json_error(['message' => 'User already exists.']);
-    }
-
-    $user_id = wp_create_user($email, $pass1, $email);
-    if (is_wp_error($user_id)) {
-        wp_send_json_error(['message' => 'Registration failed.']);
-    }
-
-    // Set role: customer
-    $user = new WP_User($user_id);
-    $user->set_role('customer');
-
-    // Send confirmation email (soft)
-    $confirm_link = add_query_arg([
-        'confirm_email' => $user_id,
-        'key'           => md5($email),
-    ], home_url('/login/'));
-
-    wp_mail(
-        $email,
-        'Confirm your email',
-        "Welcome!\n\nPlease confirm your email:\n$confirm_link"
-    );
-
-    // Auto login
-    wp_set_current_user($user_id);
-    wp_set_auth_cookie($user_id);
-
-    wp_send_json_success(['redirect' => home_url('/account/')]);
-});
-
-/**
- * Block /login for logged-in users
- */
-add_action('template_redirect', function () {
-    if (is_page('login') && is_user_logged_in()) {
-        wp_redirect(home_url('/account/'));
-        exit;
-    }
-});
-
-/**
- * Redirect after normal WP login (fallback)
- */
-add_filter('login_redirect', function ($redirect_to, $requested, $user) {
-    if (isset($user->roles) && in_array('administrator', $user->roles, true)) {
-        return admin_url();
-    }
-    return home_url('/account/');
-}, 10, 3);
-
-/**
- * Fix WP logo link in admin bar (admin only)
- */
-add_action('admin_bar_menu', function ($wp_admin_bar) {
-    if (!is_user_logged_in()) return;
-    if (!current_user_can('administrator')) return;
-
-    $node = $wp_admin_bar->get_node('wp-logo');
-    if ($node) {
-        $node->href = admin_url();
-        $wp_admin_bar->add_node($node);
-    }
-}, 999);
-
-/**
- * ============================================================
- * Protect /wp-admin
- * - Guests -> /login
- * - Admin -> OK
- * - Non-admin -> only allow editing their own profile
- * ============================================================
- */
-add_action('admin_init', function () {
-
-    // ignore AJAX
-    if (defined('DOING_AJAX') && DOING_AJAX) return;
-
-    // guests -> custom login
-    if (!is_user_logged_in()) {
-        wp_redirect(home_url('/login/'));
-        exit;
-    }
-
-    // admin always allowed
-    if (current_user_can('administrator')) {
-        return;
-    }
-
-    // non-admin: allow ONLY edit their own profile
-    $post_id = isset($_GET['post']) ? (int) $_GET['post'] : 0;
-    $action  = isset($_GET['action']) ? sanitize_text_field($_GET['action']) : '';
-
-    if ($post_id > 0 && $action === 'edit' && get_post_type($post_id) === 'profile') {
-        if (transescort_user_owns_profile(get_current_user_id(), $post_id)) {
-            return; // ok
-        }
-    }
-
-    // everything else blocked
-    wp_redirect(home_url('/account/'));
-    exit;
-});
-
-/**
- * ============================================================
- * CPT: Requests (bookings)
- * ============================================================
- */
 add_action('init', function () {
     register_post_type('request', [
         'labels' => [
             'name'          => 'Requests',
             'singular_name' => 'Request',
         ],
-        'public'    => false,
-        'show_ui'   => true,
-        'menu_icon' => 'dashicons-email-alt',
-        'supports'  => ['title'],
+        'public'             => true,
+        'publicly_queryable' => true,
+        'exclude_from_search'=> false,
+        'query_var'          => true,
+
+        "public"    => false,
+        "show_ui"   => true,
+        "menu_icon" => "dashicons-email-alt",
+        "supports"  => ["title"],
     ]);
 });
 
-/**
- * ✅ AJAX create request (единый стандарт meta)
- */
-add_action("wp_ajax_nopriv_transescort_create_request", "transescort_create_request");
-add_action("wp_ajax_transescort_create_request", "transescort_create_request");
-
-function transescort_create_request() {
-    $nonce = $_POST["nonce"] ?? ($_POST["_wpnonce"] ?? ($_POST["security"] ?? ""));
-
-    if (!$nonce || !wp_verify_nonce($nonce, "transescort_request")) {
-        wp_send_json_error(["message" => "Security error"]);
-    }
-
-    $profile_id = isset($_POST["profile_id"]) ? (int)$_POST["profile_id"] : 0;
-    $name       = isset($_POST["name"]) ? sanitize_text_field($_POST["name"]) : "";
-    $contact    = isset($_POST["contact"]) ? sanitize_text_field($_POST["contact"]) : "";
-    $datetime   = isset($_POST["datetime"]) ? sanitize_text_field($_POST["datetime"]) : "";
-    $message    = isset($_POST["message"]) ? sanitize_textarea_field($_POST["message"]) : "";
-
-
-    if (!$profile_id || !$name || !$contact) {
-        wp_send_json_error(["message" => "Required fields missing"]);
-    }
-
-    $user_id = get_current_user_id();
-
-    $request_id = wp_insert_post([
-        "post_type"   => "request",
-        "post_status" => "publish",
-        "post_title"  => "Request for profile #" . $profile_id,
-    ]);
-
-    if (!$request_id || is_wp_error($request_id)) {
-        wp_send_json_error(["message" => "Cannot create request"]);
-    }
-
-    update_post_meta($request_id, "_request_profile_id", $profile_id);
-    update_post_meta($request_id, "_request_user_id", $user_id);
-    update_post_meta($request_id, "_request_name", $name);
-    update_post_meta($request_id, "_request_contact", $contact);
-    update_post_meta($request_id, "_request_datetime", $datetime);
-    update_post_meta($request_id, "_request_message", $message);
-    update_post_meta($request_id, "_request_status", "new");
-
-    wp_send_json_success(["message" => "Request sent successfully"]);
-}
 
 function transescort_request_statuses() {
     return [
@@ -666,9 +385,7 @@ add_action('save_post_request', function($post_id, $post, $update){
     }
 }, 10, 3);
 
-/**
- * Admin list: columns
- */
+
 add_filter('manage_request_posts_columns', function($cols){
     $new = [];
     foreach ($cols as $k => $v) {
@@ -714,9 +431,7 @@ add_action('manage_request_posts_custom_column', function($col, $post_id){
     }
 }, 10, 2);
 
-/**
- * Filter by status in admin
- */
+
 add_action('restrict_manage_posts', function(){
     global $typenow;
     if ($typenow !== 'request') return;
@@ -753,9 +468,7 @@ add_action('pre_get_posts', function($q){
     }
 });
 
-/**
- * Metabox: Request details (admin) + status
- */
+
 add_action('add_meta_boxes', function () {
     add_meta_box(
         'transescort_request_details',
@@ -823,9 +536,7 @@ function transescort_request_details_metabox($post) {
     <?php
 }
 
-/**
- * Save request status
- */
+
 add_action('save_post_request', function ($post_id) {
     if (!isset($_POST['transescort_request_meta_nonce'])) return;
     if (!wp_verify_nonce($_POST['transescort_request_meta_nonce'], 'transescort_save_request_meta')) return;
@@ -839,9 +550,7 @@ add_action('save_post_request', function ($post_id) {
     update_post_meta($post_id, '_request_status', $status);
 });
 
-/**
- * Restrict requests list for non-admin: show only requests for profiles they own
- */
+
 add_action('pre_get_posts', function($q){
     if (!is_admin() || !$q->is_main_query()) return;
     if ($q->get('post_type') !== 'request') return;
@@ -866,9 +575,7 @@ add_action('pre_get_posts', function($q){
     }
 });
 
-/**
- * Get requests for a profile (latest first)
- */
+
 function transescort_get_profile_requests($profile_id, $limit = 10) {
     $profile_id = (int) $profile_id;
     $limit      = (int) $limit;
@@ -886,23 +593,15 @@ function transescort_get_profile_requests($profile_id, $limit = 10) {
     ]);
 }
 
-/**
- * Human label for request status
- */
+
 function transescort_request_status_label($status) {
     $map = transescort_request_statuses();
     return isset($map[$status]) ? $map[$status] : $status;
 }
 
-/**
- * ============================================================
- * ✅ VIDEO: Cover metabox + wp.media + сохранение _video_cover_id
- * ============================================================
- */
 
-/**
- * Подключаем медиабиблиотеку в админке (чтобы работал wp.media)
- */
+
+
 add_action('admin_enqueue_scripts', function ($hook) {
 
     $screen = function_exists('get_current_screen') ? get_current_screen() : null;
@@ -916,12 +615,7 @@ add_action('admin_enqueue_scripts', function ($hook) {
     }
 });
 
-/**
- * Метабоксы для CPT video
- * ВАЖНО: функции te_video_file_metabox / te_video_profile_metabox / te_video_meta_metabox
- * должны существовать (если они у тебя в другом файле — ок).
- * Мы добавляем только 4-й: te_video_cover_metabox
- */
+
 add_action('add_meta_boxes', function () {
     if (!post_type_exists('video')) return;
 
@@ -934,9 +628,7 @@ add_action('add_meta_boxes', function () {
     add_meta_box('te_video_cover', 'Video cover', 'te_video_cover_metabox', 'video', 'side', 'default');
 });
 
-/**
- * Metabox: Video cover
- */
+
 function te_video_cover_metabox($post) {
     wp_nonce_field('te_video_cover_save', 'te_video_cover_nonce');
 
@@ -958,52 +650,10 @@ function te_video_cover_metabox($post) {
     echo '<button type="button" class="button" id="te_video_cover_remove">Remove</button>';
     ?>
 
-    <script>
-    (function($){
-      let frame;
-      $('#te_video_cover_pick').on('click', function(e){
-        e.preventDefault();
-        if(frame){ frame.open(); return; }
-
-        frame = wp.media({
-          title: 'Select cover image',
-          button: { text: 'Use this image' },
-          library: { type: 'image' },
-          multiple: false
-        });
-
-        frame.on('select', function(){
-          const att = frame.state().get('selection').first().toJSON();
-          $('#te_video_cover_id').val(att.id);
-
-          const url = (att.sizes && att.sizes.medium) ? att.sizes.medium.url : att.url;
-
-          $('#te_video_cover_preview').html(
-            '<img src="'+url+'" style="width:100%; border-radius:10px;">'
-          );
-        });
-
-        frame.open();
-      });
-
-      $('#te_video_cover_remove').on('click', function(e){
-        e.preventDefault();
-        $('#te_video_cover_id').val('');
-        $('#te_video_cover_preview').html('<p style="opacity:.7;">No cover selected.</p>');
-      });
-    })(jQuery);
-    </script>
     <?php
 }
 
-/**
- * ✅ Сохранение cover meta ВНУТРИ save_post_video
- * (добавляем ровно тот кусок, который ты просил)
- *
- * ВАЖНО: если у тебя уже есть save_post_video — тогда:
- * 1) удали этот add_action ниже
- * 2) просто скопируй блок "cover image" и вставь в твой существующий save_post_video
- */
+
 add_action('save_post_video', function($post_id){
 
   // autosave / revision
@@ -1041,44 +691,6 @@ add_action('save_post_video', function($post_id){
   // -------------------------
   // 3) duration
   // -------------------------
-  $dur = isset($_POST['te_video_duration']) ? sanitize_text_field($_POST['te_video_duration']) : '';
-  if ($dur !== '') {
-    update_post_meta($post_id, '_video_duration', $dur);
-  } else {
-    delete_post_meta($post_id, '_video_duration');
-  }
-
-  // -------------------------
-  // 4) cover image (то, что ты просил)
-  // -------------------------
-  $cover_id = isset($_POST['te_video_cover_id']) ? (int) $_POST['te_video_cover_id'] : 0;
-  if ($cover_id) {
-    update_post_meta($post_id, '_video_cover_id', $cover_id);
-  } else {
-    delete_post_meta($post_id, '_video_cover_id');
-  }
-
-}, 10, 1);
-
-// Auto-create Profile and link it to user on register
-add_action('user_register', function ($user_id) {
-    $user = get_userdata($user_id);
-    if (!$user) return;
-
-    // если профиль уже есть — не создаём второй
-    $existing = (int) get_user_meta($user_id, '_linked_profile_id', true);
-    if ($existing > 0) return;
-
-    $title = $user->display_name ? $user->display_name : $user->user_login;
-
-    $profile_id = wp_insert_post([
-        'post_type'   => 'profile',
-        'post_status' => 'publish',
-        'post_title'  => $title,
-    ]);
-
-    if (is_wp_error($profile_id) || !$profile_id) return;
-
     // link both ways
     update_post_meta($profile_id, '_profile_user_id', (int)$user_id);
     update_user_meta($user_id, '_linked_profile_id', (int)$profile_id);
@@ -1197,4 +809,250 @@ add_action('template_redirect', function () {
     wp_safe_redirect(add_query_arg('deleted', '1', get_permalink()));
     exit;
 });
+
+/**
+ * Admin: Requests list — show Profile name instead of ID in "Title" column
+ */
+add_filter('the_title', function ($title, $post_id) {
+    if (is_admin() && get_post_type($post_id) === 'request') {
+        $profile_id = (int) get_post_meta($post_id, '_request_profile_id', true);
+        if ($profile_id > 0) {
+            $profile_title = get_the_title($profile_id);
+            if (!$profile_title) $profile_title = 'Profile #' . $profile_id;
+
+            // Title in list
+            return 'Request for ' . $profile_title;
+        }
+    }
+    return $title;
+}, 10, 2);
+
+/**
+ * Admin: Requests list — make the title link go to Profile edit (optional)
+ * If you don't want this behavior, delete this block.
+ */
+add_filter('post_row_actions', function ($actions, $post) {
+    if (is_admin() && $post && $post->post_type === 'request') {
+        $profile_id = (int) get_post_meta($post->ID, '_request_profile_id', true);
+        if ($profile_id > 0) {
+            $actions['edit_profile'] = '<a href="' . esc_url(get_edit_post_link($profile_id)) . '">Edit Profile</a>';
+        }
+    }
+    return $actions;
+}, 10, 2);
+
+
+/**
+ * Personal Profile: save city (user selects from admin list)
+ */
+add_action('template_redirect', function () {
+    if (!is_page('personal-profile')) return;
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') return;
+    if (!is_user_logged_in()) return;
+
+    if (empty($_POST['action']) || $_POST['action'] !== 'transescort_save_profile_city') return;
+
+    if (empty($_POST['transescort_save_profile_city_nonce']) ||
+        !wp_verify_nonce($_POST['transescort_save_profile_city_nonce'], 'transescort_save_profile_city')) {
+        wp_die('Security error');
+    }
+
+    $user_id    = get_current_user_id();
+    $profile_id = (int) transescort_get_linked_profile_id($user_id);
+    if (!$profile_id) wp_die('No linked profile');
+
+    // owner/admin only
+    if (!current_user_can('administrator') && !transescort_user_owns_profile($user_id, $profile_id)) {
+        wp_die('No permission');
+    }
+
+    $city   = sanitize_text_field($_POST['profile_city'] ?? '');
+    $cities = transescort_city_list();
+
+    // allow only from list (no "!" to avoid shell history issues)
+    if (array_key_exists($city, $cities) === false) {
+        $city = '';
+    }
+
+    update_post_meta($profile_id, '_profile_city', $city);
+
+    wp_redirect(add_query_arg('saved', 'city', get_permalink()));
+    exit;
+});
+
+/* === Profile image helper (featured -> gallery -> fallback) === */
+if (!function_exists('transescort_get_profile_image_url')) {
+  function transescort_get_profile_image_url($post_id, $size = 'medium_large', $fallback = '' ) {
+    if (!$fallback) {
+      $fallback = get_template_directory_uri() . '/assets/img/hero-preview.jpg';
+    }
+    if ($post_id && has_post_thumbnail($post_id)) {
+      $src = get_the_post_thumbnail_url($post_id, $size);
+      if ($src) return $src;
+    }
+    $raw = $post_id ? get_post_meta($post_id, '_profile_gallery_ids', true) : null;
+    $ids = is_string($raw) ? maybe_unserialize($raw) : $raw;
+    if (is_array($ids) && !empty($ids)) {
+      $first_id = intval($ids[0]);
+      if ($first_id) {
+        $src2 = wp_get_attachment_image_url($first_id, $size);
+        if ($src2) return $src2;
+      }
+    }
+    return $fallback;
+  }
+}
+
+
+// Create profile on demand from /personal-profile/?create=1
+add_action('template_redirect', function () {
+    if (!is_page('personal-profile')) return;
+    if (!is_user_logged_in()) return;
+    if (!isset($_GET['create']) || $_GET['create'] !== '1') return;
+
+    $user_id = get_current_user_id();
+
+    // already linked -> just go back
+    $existing = (int) get_user_meta($user_id, '_linked_profile_id', true);
+    if ($existing > 0) {
+        wp_safe_redirect(remove_query_arg('create', add_query_arg('created', '0', get_permalink())));
+        exit;
+    }
+
+    $user = get_userdata($user_id);
+    $title = ($user && $user->display_name) ? $user->display_name : ($user ? $user->user_login : 'My Profile');
+
+    $profile_id = wp_insert_post([
+        'post_type'   => 'profile',
+        'post_status' => 'publish',
+        'post_title'  => $title,
+    ]);
+
+    if (is_wp_error($profile_id) || !$profile_id) {
+        wp_die('Failed to create profile');
+    }
+
+    update_post_meta($profile_id, '_profile_user_id', (int)$user_id);
+    update_user_meta($user_id, '_linked_profile_id', (int)$profile_id);
+
+    wp_safe_redirect(remove_query_arg('create', add_query_arg('created', '1', get_permalink())));
+    exit;
+});
+
+
+/** Set main photo (thumbnail) from profile gallery */
+add_action("admin_post_transescort_set_main_photo", "transescort_set_main_photo_handler");
+function transescort_set_main_photo_handler(){
+  if (!is_user_logged_in()) { wp_die("Access denied", "Access denied", ["response"=>403]); }
+  if (!isset($_POST["transescort_set_main_photo_nonce"]) || !wp_verify_nonce($_POST["transescort_set_main_photo_nonce"], "transescort_set_main_photo")) {
+    wp_die("Bad nonce", "Bad nonce", ["response"=>400]);
+  }
+  $user_id = get_current_user_id();
+  $profile_id = isset($_POST["profile_id"]) ? (int)$_POST["profile_id"] : 0;
+  $att_id = isset($_POST["att_id"]) ? (int)$_POST["att_id"] : 0;
+  if (!$profile_id || !$att_id) { wp_safe_redirect(wp_get_referer() ?: home_url("/")); exit; }
+
+  if (!(current_user_can("administrator") || (function_exists("transescort_user_owns_profile") && transescort_user_owns_profile($user_id, $profile_id)))) {
+    wp_die("Access denied", "Access denied", ["response"=>403]);
+  }
+
+  $g = get_post_meta($profile_id, "_profile_gallery_ids", true);
+  if (!is_array($g)) $g = [];
+  $g = array_values(array_unique(array_map("intval", $g)));
+  if (!in_array($att_id, $g, true)) {
+    wp_die("Photo not in gallery", "Photo not in gallery", ["response"=>400]);
+  }
+
+  set_post_thumbnail($profile_id, $att_id);
+  $ref = wp_get_referer();
+  if (!$ref) $ref = get_permalink($profile_id);
+  $ref = remove_query_arg(["main","upload","deleted"], $ref);
+  wp_safe_redirect(add_query_arg("main", "1", $ref));
+  exit;
+}
+
+
+
+add_action("admin_footer", function(){
+  $screen = function_exists("get_current_screen") ? get_current_screen() : null;
+  if (!$screen) return;
+  $pt = isset($screen->post_type) ? $screen->post_type : "";
+  if (!in_array($pt, ["profile","video"], true)) return;
+
+  echo "<script>(function($){";
+
+  echo "function initProfileGallery(){";
+  echo "if(!$(\"#te-profile-gallery-add\").length) return;";
+  echo "let frame;";
+  echo "$(document).on(\"click\", \"#te-profile-gallery-add\", function(e){";
+  echo "e.preventDefault();";
+  echo "frame=wp.media({title:\"Select gallery images\",button:{text:\"Use selected\"},library:{type:\"image\"},multiple:true});";
+  echo "frame.on(\"select\", function(){";
+  echo "const selection=frame.state().get(\"selection\").toJSON();";
+  echo "const ids=selection.map(i=>i.id);";
+  echo "$(\"#te_profile_gallery_ids\").val(ids.join(\",\"));";
+  echo "const preview=$(\"#te-profile-gallery-preview\");preview.empty();";
+  echo "selection.forEach(i=>{const url=(i.sizes&&i.sizes.thumbnail)?i.sizes.thumbnail.url:i.url;preview.append(\"<img src=\\\"\"+url+\"\\\" style=\\\"width:100%;border-radius:10px;\\\">\");});";
+  echo "});";
+  echo "frame.open();";
+  echo "});";
+  echo "$(document).on(\"click\", \"#te-profile-gallery-clear\", function(e){e.preventDefault();$(\"#te_profile_gallery_ids\").val(\"\");$(\"#te-profile-gallery-preview\").empty();});";
+  echo "}";
+
+  echo "function initVideoCover(){";
+  echo "if(!$(\"#te_video_cover_pick\").length) return;";
+  echo "let frame;";
+  echo "$(document).on(\"click\", \"#te_video_cover_pick\", function(e){";
+  echo "e.preventDefault();";
+  echo "if(frame){frame.open();return;}";
+  echo "frame=wp.media({title:\"Select cover image\",button:{text:\"Use this image\"},library:{type:\"image\"},multiple:false});";
+  echo "frame.on(\"select\", function(){";
+  echo "const att=frame.state().get(\"selection\").first().toJSON();";
+  echo "$(\"#te_video_cover_id\").val(att.id);";
+  echo "const url=(att.sizes&&att.sizes.medium)?att.sizes.medium.url:att.url;";
+  echo "$(\"#te_video_cover_preview\").html(\"<img src=\\\"\"+url+\"\\\" style=\\\"width:100%; border-radius:10px;\\\">\");";
+  echo "});";
+  echo "frame.open();";
+  echo "});";
+  echo "$(document).on(\"click\", \"#te_video_cover_remove\", function(e){e.preventDefault();$(\"#te_video_cover_id\").val(\"\");$(\"#te_video_cover_preview\").html(\"<p style=\\\"opacity:.7;\\\">No cover selected.</p>\");});";
+  echo "}";
+
+  echo "$(function(){initProfileGallery();initVideoCover();});";
+  echo "})(jQuery);</script>";
+});
+
+
+
+/**
+ * Brute-force protection (IP based)
+ */
+function transescort_check_login_attempts($email = "") {
+    $ip = $_SERVER["REMOTE_ADDR"] ?? "0.0.0.0";
+    $key = "transescort_login_attempts_" . md5($ip);
+    $data = get_transient($key);
+    if (!is_array($data)) {
+        $data = ["count" => 0, "time" => time()];
+    }
+    // 5 tries / 10 minutes
+    if ((int)($data["count"] ?? 0) >= 5 && (time() - (int)($data["time"] ?? time())) < 600) {
+        wp_send_json_error(["message" => "Слишком много попыток. Попробуйте через 10 минут."]);
+    }
+    return $key;
+}
+
+function transescort_register_failed_attempt($key) {
+    $data = get_transient($key);
+    if (!is_array($data)) {
+        $data = ["count" => 0, "time" => time()];
+    }
+    $data["count"] = (int)($data["count"] ?? 0) + 1;
+    $data["time"] = time();
+    set_transient($key, $data, 600);
+}
+
+function transescort_clear_failed_attempts() {
+    $ip = $_SERVER["REMOTE_ADDR"] ?? "0.0.0.0";
+    $key = "transescort_login_attempts_" . md5($ip);
+    delete_transient($key);
+}
 

@@ -1,0 +1,22 @@
+<?php
+defined('ABSPATH') || exit;
+
+add_action('init', function () {
+    register_post_type('profile', [
+        'labels' => [
+            'name'          => 'Profiles',
+            'singular_name' => 'Profile',
+
+        ],
+        'public'             => true,
+        'publicly_queryable' => true,
+        'exclude_from_search'=> false,
+        'query_var'          => true,
+
+        'has_archive'   => true,
+        'rewrite'       => ['slug' => 'profiles'],
+        'menu_icon'     => 'dashicons-id',
+        'supports'      => ['title', 'editor', 'thumbnail', 'excerpt'],
+        'show_in_rest'  => true,
+    ]);
+});

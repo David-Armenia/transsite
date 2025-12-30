@@ -1,0 +1,33 @@
+<?php
+$theme_inc = get_template_directory() . "/inc";
+require_once $theme_inc . "/security.php";
+
+require_once $theme_inc . "/enqueue.php";
+require_once $theme_inc . "/ajax.php";
+require_once $theme_inc . "/setup.php";
+require_once $theme_inc . "/cpt-profile.php";
+require_once $theme_inc . "/helpers.php";
+require_once $theme_inc . "/personal-profile.php";
+
+require_once $theme_inc . "/admin-profile.php";
+
+require_once $theme_inc . "/admin-requests.php";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

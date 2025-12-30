@@ -4350,10 +4350,3 @@ body.single-profile .sp-gallery-wrap{position:relative !important;}
     transition:none !important;
   }
 }
-
-/* --- FIX: prevent overlay/redirect when clicking Favorite button --- */
-.profile-right .sp-actions{ position:relative; z-index:20; }
-.profile-right .sp-actions .btn{ position:relative; z-index:20; }
-.profile-right a.btn.btn-primary{ position:relative; z-index:1; }
-/* optional: keep edit link below buttons */
-.profile-right .sp-edit-profile{ display:block; margin-top:12px; }

@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
 
       errorBox.style.display = 'none';
-      errorBox.innerHTML = '';
+      errorBox.textContent = '';
 
       if (submitBtn) {
         submitBtn.disabled = true;
@@ -81,10 +81,10 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
 
-        errorBox.innerHTML = getMsg(payload, fallbackError);
+        errorBox.textContent = getMsg(payload, fallbackError);
         errorBox.style.display = 'block';
       } catch (err) {
-        errorBox.innerHTML = 'Server error. Please try again.';
+        errorBox.textContent = 'Server error. Please try again.';
         errorBox.style.display = 'block';
       } finally {
         if (submitBtn) {

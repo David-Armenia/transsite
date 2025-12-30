@@ -1,6 +1,7 @@
 <?php
 $theme_inc = get_template_directory() . "/inc";
 
+
 /**
  * THEME INC MAP
  *
@@ -46,6 +47,7 @@ require_once $theme_inc . "/personal-profile.php";
 // Admin: profile/video metaboxes, request admin UI helpers
 // Admin: profile/video metaboxes + request admin UI parts
 require_once $theme_inc . "/admin-profile.php";
+// Admin: Requests list title/actions improvements
 // Admin: Requests list title/actions improvements
 require_once $theme_inc . "/admin-requests.php";
 

@@ -168,14 +168,6 @@ $gallery_ids = array_values(array_unique(array_map('intval', $gallery_ids)));
               <?php endif; ?>
             </h1>
 
-          <?php
-            $fav_on = false;
-            if (is_user_logged_in()) {
-              $fav_ids = get_user_meta(get_current_user_id(), "_favorite_profile_ids", true);
-              if (is_array($fav_ids)) $fav_on = in_array((int)$profile_id, array_map("intval",$fav_ids), true);
-            }
-          ?>
-          <button type="button" class="sp-fav js-fav-toggle<?php echo $fav_on ? " is-active" : ""; ?>" data-profile="<?php echo (int)$profile_id; ?>" aria-label="Favorite">♡ <span class="sp-fav-text"><?php echo $fav_on ? "В избранном" : "В избранное"; ?></span></button>
 
             <?php if (!empty($city)): ?>
               <div class="profile-city"><?php echo esc_html($city); ?></div>
@@ -223,13 +215,31 @@ $gallery_ids = array_values(array_unique(array_map('intval', $gallery_ids)));
             $fav_nonce = wp_create_nonce("te_fav_profile");
           ?>
 
-          <div class="sp-actions">
-            <button type="button" class="btn btn-secondary sp-like js-fav-toggle <?php echo $fav_active ? "is-active" : ""; ?>" data-profile="<?php echo (int)$profile_id; ?>" data-nonce="<?php echo esc_attr($fav_nonce); ?>"><?php echo $fav_active ? "♥ В избранном" : "♡ Добавить в избранное"; ?></button>
-            <button type="button" class="btn btn-primary sp-msg">Написать</button>
-          </div>
+
+<?php
+$fav_active = false;
+if (is_user_logged_in()) {
+  $fav_ids = get_user_meta(get_current_user_id(), "_favorite_profile_ids", true);
+  if (is_array($fav_ids)) {
+    $fav_active = in_array((int)$profile_id, array_map("intval", $fav_ids), true);
+  }
+}
+$fav_nonce = wp_create_nonce("te_fav_profile");
+?>
+
+<div class="sp-actions">
+  <button type="button" class="btn btn-secondary sp-like js-fav-toggle <?php echo $fav_active ? "is-active" : ""; ?>" data-profile="<?php echo (int)$profile_id; ?>" data-nonce="<?php echo esc_attr($fav_nonce); ?>">
+    <?php echo $fav_active ? "♥ В избранном" : "♡ Добавить в избранное"; ?>
+  </button>
+  <button type="button" class="btn btn-primary sp-msg">Написать</button>
+<?php if ($is_owner): ?>
+  <a class="btn btn-primary sp-edit-profile" href="<?php echo esc_url(home_url("/personal-profile/")); ?>">Редактировать профиль</a>
+<?php endif; ?>
+<?php if ($is_owner): ?>
+<?php endif; ?>
+</div>
 
           <?php if ($is_owner): ?>
-            <a class="btn btn-primary" href="<?php echo esc_url(home_url("/personal-profile/")); ?>">Редактировать профиль</a>
           <?php endif; ?>
         </div>
     </aside>
@@ -261,45 +271,6 @@ document.addEventListener("DOMContentLoaded", function () {
 </script>
 
 <script>
-document.addEventListener("click", async function(e){
-  const btn = e.target.closest(".js-fav-toggle");
-  if (!btn) return;
-  e.preventDefault();
-
-  const profileId = btn.getAttribute("data-profile");
-  const nonce = btn.getAttribute("data-nonce");
-  if (!profileId || !nonce) return;
-
-  btn.disabled = true;
-  try {
-    const body = new URLSearchParams();
-    body.append("action", "te_toggle_favorite_profile");
-    body.append("profile_id", profileId);
-    body.append("nonce", nonce);
-
-    const ajaxurl = (window.TRANS && TRANS.ajaxurl) ? TRANS.ajaxurl : "/wp-admin/admin-ajax.php";
-    const res = await fetch(ajaxurl, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8" },
-      body: body.toString()
-    });
-
-    const json = await res.json();
-    if (!json || !json.success) {
-      if (res.status === 401) alert("Нужно войти, чтобы добавлять в избранное.");
-      return;
-    }
-
-    const active = !!json.data.active;
-    btn.classList.toggle("is-active", active);
-    btn.textContent = active ? "♥ В избранном" : "♡ Добавить в избранное";
-  } catch (err) {
-    console.error(err);
-  } finally {
-    btn.disabled = false;
-  }
-});
-</script>
 
 </main>
 
